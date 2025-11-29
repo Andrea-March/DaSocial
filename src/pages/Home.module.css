@@ -1,0 +1,29 @@
+.container {
+  padding-bottom: 60px; /* spazio per bottom bar */
+  background: var(--bg-main);
+}
+
+.emptyState {
+  padding: 32px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.title {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.content {
+  margin-top: 8px;
+}
+
+.feed {
+  margin-top: 8px;
+}

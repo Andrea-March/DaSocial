@@ -1,0 +1,22 @@
+.nav {
+  height: 56px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-main);
+}
+
+.icon {
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.add {
+  cursor: pointer;
+  color: var(--accent);
+}

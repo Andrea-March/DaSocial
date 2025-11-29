@@ -1,0 +1,59 @@
+.container {
+  padding: 32px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: var(--text-primary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.input {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.loginBtn {
+  padding: 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.smallText {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.link {
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 4px;
+}

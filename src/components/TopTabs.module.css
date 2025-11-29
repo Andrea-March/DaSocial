@@ -1,0 +1,19 @@
+.nav {
+  display: flex;
+  justify-content: space-around;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-main);
+}
+
+.tab {
+  padding: 12px 0;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.active {
+  border-bottom: 2px solid var(--accent);
+  color: var(--text-primary);
+  font-weight: 600;
+}

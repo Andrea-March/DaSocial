@@ -1,0 +1,72 @@
+.container {
+  padding: 32px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.input {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.registerBtn {
+  padding: 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.smallText {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.link {
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.error {
+  font-size: 13px;
+  color: #d00000; /* rosso serio */
+  margin-top: -14px;
+  margin-bottom: 14px;
+}
