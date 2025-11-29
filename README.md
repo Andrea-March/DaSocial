@@ -56,32 +56,8 @@ App reattiva, minimale e professionale — sviluppata come **PWA** con React + V
 
 ---
 
-## 📁 Struttura progetto
 
-src/
-├─ components/
-│ ├─ Header.jsx
-│ ├─ TopTabs.jsx
-│ ├─ BottomNav.jsx
-│ ├─ Post.jsx
-│ └─ ...
-│
-├─ pages/
-│ ├─ Login.jsx
-│ ├─ Register.jsx
-│ ├─ ForgotPassword.jsx
-│ └─ Home.jsx
-│
-├─ styles/
-│ ├─ reset.css
-│ ├─ global.css
-│ ├─ colors.css
-│ └─ ...
-│
-├─ App.jsx
-└─ main.jsx
-
-🧩 To-do Roadmap
+## 🧩 To-do Roadmap
 🔥 MVP Core
 
  Integrazione Login + Register con Supabase Auth
