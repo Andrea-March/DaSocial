@@ -1,16 +1,111 @@
-# React + Vite
+# 📱 DaSocial
+La piattaforma sociale ufficiale del **Liceo Da Vinci**.  
+App reattiva, minimale e professionale — sviluppata come **PWA** con React + Vite + Supabase.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## 🚀 Caratteristiche principali (MVP)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### ✔ Autenticazione
+- Login
+- Registrazione con username validato
+- Reset password
+- UI coerente e moderna
+- Pronto per integrazione Supabase Auth
 
-## React Compiler
+### ✔ Bacheca
+- Feed post con:
+  - autore
+  - testo
+  - immagini
+  - like
+  - commenti + risposte (1 livello)
+- Mock data già implementati
+- UI minimal, 100% width, stile social moderno
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### ✔ Design
+- Componenti React + CSS Modules
+- Palette colori “DaSocial” con variabili globali
+- Layout perfetto su mobile
+- Icone `lucide-react`
+- Nessun bordo arrotondato, look professionale
 
-## Expanding the ESLint configuration
+### ✔ PWA-ready
+- `manifest.json`
+- icone PWA
+- service worker via `vite-plugin-pwa`
+- modalità offline
+- installabile su Android / iOS / Desktop
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠 Stack Tecnologico
+
+**Frontend**
+- React + Vite
+- CSS Modules
+- lucide-react icons
+- Vite PWA Plugin
+
+**Backend (previsto)**
+- Supabase:
+  - Auth
+  - Database PostgreSQL
+  - Storage (immagini post + documenti)
+  - Policies (RLS)
+
+---
+
+## 📁 Struttura progetto
+
+src/
+├─ components/
+│ ├─ Header.jsx
+│ ├─ TopTabs.jsx
+│ ├─ BottomNav.jsx
+│ ├─ Post.jsx
+│ └─ ...
+│
+├─ pages/
+│ ├─ Login.jsx
+│ ├─ Register.jsx
+│ ├─ ForgotPassword.jsx
+│ └─ Home.jsx
+│
+├─ styles/
+│ ├─ reset.css
+│ ├─ global.css
+│ ├─ colors.css
+│ └─ ...
+│
+├─ App.jsx
+└─ main.jsx
+
+🧩 To-do Roadmap
+🔥 MVP Core
+
+ Integrazione Login + Register con Supabase Auth
+
+ Routing (React Router)
+
+ Creazione post (testo + immagine)
+
+ Visualizzazione post da database
+
+ Sistema di ruoli (studenti / rappresentanti)
+
+🔔 Feature future
+
+ Notifiche push (PWA + Supabase Edge)
+
+ Mercatino libri usati
+
+ Broadcast ufficiali dei rappresentanti
+
+ Moderazione (report, soft delete)
+
+ Uso codice-classe per registrazione sicura
+
+
+📄 Licenza
+MIT License.
