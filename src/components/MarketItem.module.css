@@ -1,0 +1,31 @@
+.card {
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 0;
+}
+
+.image {
+  width: 100%;
+  border: 1px solid var(--border-color);
+}
+
+.info {
+  margin-top: 10px;
+}
+
+.itemTitle {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.price {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+}

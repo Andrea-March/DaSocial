@@ -1,5 +1,6 @@
 import styles from "./Register.module.css";
 import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -8,10 +9,31 @@ export default function Register() {
   const [confirm, setConfirm] = useState("");
   const [usernameError, setUsernameError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("REGISTER:", name, email, password, confirm);
-    // Qui collegheremo Supabase Auth
+
+    if (password !== confirm) {
+      alert("Le password non coincidono");
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username: name.toLowerCase(),
+        },
+      },
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    // Successo → redirect al login
+    window.location.href = "/login";
   };
 
   const validateUsername = (u) => {

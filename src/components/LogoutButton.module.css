@@ -1,0 +1,15 @@
+.logoutBtn {
+  width: 100%;
+  padding: 14px 0;
+  border: 1px solid #d00000;
+  background: #fff;
+  color: #d00000;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.logoutBtn:hover {
+  background: #ffe5e5;
+}

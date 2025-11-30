@@ -1,0 +1,25 @@
+.card {
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cardTitle {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.time {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.content {
+  font-size: 15px;
+  line-height: 1.5;
+}

@@ -16,6 +16,10 @@
   color: var(--text-primary);
 }
 
+.active {
+  color: var(--accent-secondary);
+}
+
 .add {
   cursor: pointer;
   color: var(--accent);

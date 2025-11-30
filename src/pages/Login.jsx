@@ -1,14 +1,34 @@
 import styles from "./Login.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        window.location.href = "/";
+      }
+    });
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("LOGIN:", email, password);
-    // Qui poi colleghiamo Supabase
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    // Login riuscito → vai alla Home
+    window.location.href = "/";
   };
 
   return (

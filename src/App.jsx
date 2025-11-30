@@ -1,20 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Routes, Route, useLocation } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import './App.css'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
+import Broadcast from './pages/Broadcast'
+import Market from './pages/Market'
+import BottomNav from './components/BottomNav'
+import Profile from "./pages/Profile";
 
-function App() {
-  const [count, setCount] = useState(0)
+
+export default function App() {
+  const location = useLocation();
+
+  // Mostriamo la BottomNav solo nelle pagine interne
+  const hideBottomNav = 
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/forgot-password";
 
   return (
     <>
-      <ForgotPassword />
-    </>
-  )
-}
+      <Routes>
+        {/* PUBBLICHE */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-export default App
+        {/* INTERNE */}
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/broadcast"
+          element={
+            <ProtectedRoute>
+              <Broadcast />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/market"
+          element={
+            <ProtectedRoute>
+              <Market />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+
+      {!hideBottomNav && <BottomNav />}
+    </>
+  );
+}

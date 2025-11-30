@@ -1,11 +1,13 @@
 import Header from "../components/Header";
 import TopTabs from "../components/TopTabs";
-import BottomNav from "../components/BottomNav";
-
 import styles from "./Home.module.css";
 import Post from "../components/Post";
 
-const posts = [
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
+import PostSkeleton from "../components/PostSkeleton";
+
+const mockPost = 
   {
     id: 1,
     author: "Nome Utente",
@@ -16,21 +18,62 @@ const posts = [
     comments: [
       {
         id: 1,
-        author: "Nome Utente",
-        text: "Testo del commento",
+        author: "Giulia D.",
+        text: "Grazie per l'avviso!",
+        time: "2h fa",
         replies: [
           {
             id: 11,
-            author: "Nome Utente",
-            text: "Testo del sottocommento"
+            author: "Marco R.",
+            text: "Figurati!",
+            time: "1h fa"
           }
         ]
       }
     ]
-  }
-];
+  };
 
 export default function Home() {
+
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadPosts = async () => {
+    setLoading(true);
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      id,
+      content,
+      image_url,
+      like_count,
+      created_at,
+      user_id,
+      profiles (
+        username,
+        avatar_url
+      )
+    `)
+    .order("created_at", { ascending: false });
+    console.log(error)
+
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setPosts(data);
+    setLoading(false);
+  };
+
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+
   return (
     <div className={styles.container}>
         <Header />
@@ -44,14 +87,18 @@ export default function Home() {
                     </div>
                 ) : (
                     <div className={styles.feed}>
-                    {posts.map((p) => (
-                        <Post key={p.id} post={p} />
-                    ))}
+                      {loading ? (
+                        <>
+                          <PostSkeleton />
+                          <PostSkeleton />
+                          <PostSkeleton />
+                        </>
+                      ) : (
+                        posts.map((p) => <Post key={p.id} post={p} />)
+                      )}
                     </div>
                 )}
         </div>
-
-        <BottomNav />
     </div>
   );
 }
