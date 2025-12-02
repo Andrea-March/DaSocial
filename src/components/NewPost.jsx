@@ -3,11 +3,14 @@ import { useUser } from "../context/UserContext";
 import styles from "./NewPost.module.css";
 import { X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
+import { usePostContext } from "../context/PostContext";
 
 export default function NewPost({ onClose }) {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const MAX_CHARS = 500;
+
+  const { triggerPostCreated } = usePostContext();
 
   const { user } = useUser();
 
@@ -48,8 +51,28 @@ const handlePost = async () => {
     setText("");
     onClose(); // chiude il modal
 
-    // Se vuoi: ricarica il feed dopo la creazione
-    if (onPostCreated) onPostCreated(data[0]);
+    const newPostId = data[0].id;
+
+    // 2. fai una nuova fetch con la JOIN sui profiles
+    const { data: fullPost } = await supabase
+      .from("posts")
+      .select(`
+        id,
+        content,
+        image_url,
+        like_count,
+        created_at,
+        user_id,
+        profiles (
+          username,
+          avatar_url
+        )
+      `)
+      .eq("id", newPostId)
+      .single();
+
+    // 3. invia il post completo al feed
+    triggerPostCreated(fullPost);
 };
 
   return (

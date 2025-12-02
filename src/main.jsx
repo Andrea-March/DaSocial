@@ -9,6 +9,7 @@ import './styles/global.css'
 import { registerSW } from 'virtual:pwa-register'
 import { UserProvider } from "./context/UserContext";
 import { ToastProvider } from "./context/ToastContext";
+import { PostProvider } from "./context/PostContext";
 
 registerSW({
   onNeedRefresh() {},
@@ -19,7 +20,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <UserProvider >
       <ToastProvider >
-        <App />
+        <PostProvider >
+          <App />
+        </PostProvider>
       </ToastProvider>
     </UserProvider >
   </BrowserRouter>

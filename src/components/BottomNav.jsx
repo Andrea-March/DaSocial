@@ -3,11 +3,14 @@ import { Home, Megaphone, PlusCircle, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 import NewPost from "./NewPost";
 import { useNavigate, useLocation } from "react-router-dom";
+import { usePostContext } from "../context/PostContext";
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showNewPost, setShowNewPost] = useState(false);
+
+  const { openNewPost } = usePostContext();
 
   return (
     <nav className={styles.nav}>
@@ -21,7 +24,7 @@ export default function BottomNav() {
           <Megaphone size={24} className={location.pathname === "/broadcast" ? styles.active : ""} />
         </div>
 
-        <div className={styles.add} onClick={() => setShowNewPost(true)}>
+        <div className={styles.add} onClick={openNewPost}>
           <PlusCircle size={28} />
         </div>
 
@@ -34,7 +37,7 @@ export default function BottomNav() {
             onClick={() => navigate("/profile")}>
           <User size={24} className={location.pathname === "/profile" ? styles.active : ""} />
         </div>
-        {showNewPost && <NewPost onClose={() => setShowNewPost(false)} onPostCreated={handlePostCreated} />}
+        {showNewPost && <NewPost onClose={() => setShowNewPost(false)} />}
     </nav>
   );
 }

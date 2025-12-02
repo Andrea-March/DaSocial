@@ -1,6 +1,8 @@
 import styles from "./Post.module.css";
 import { Heart, MessageSquare, MoreVertical } from "lucide-react";
 import { useState } from "react";
+import { timeAgo } from "../lib/timeAgo";
+
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -10,10 +12,16 @@ export default function Post({ post }) {
       {/* HEADER */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <div className={styles.avatar}></div>
+          {post.profiles?.avatar_url ? (
+              <img src={post.profiles.avatar_url} className={styles.avatar} alt="" />
+            ) : (
+              <div className={styles.avatarFallback}>
+                {post.username?.[0]?.toUpperCase() || "?"}
+              </div>
+          )}
           <div className={styles.info}>
-            <div className={styles.author}>{post.author}</div>
-            <div className={styles.time}>{post.time}</div>
+            <div className={styles.author}>{post.profiles.username}</div>
+            <div className={styles.time}>{timeAgo(post.created_at)}</div>
           </div>
         </div>
 

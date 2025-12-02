@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import imageCompression from "browser-image-compression";
 import styles from "./ProfileComponent.module.css";
 import { useUser } from "../context/UserContext";
 import { supabase } from "../lib/supabaseClient";
@@ -27,45 +28,53 @@ export default function ProfileComponent() {
     const file = e.target.files[0];
     if (!file) return;
 
+    // --- LIMITE MAX 3MB ---
+    const MAX_SIZE_MB = 3;
+    if (file.size / 1024 / 1024 > MAX_SIZE_MB) {
+      showToast("L'immagine è troppo grande (max 3MB)", "error");
+      return;
+    }
+
+    // --- COMPRESSIONE ---
+    const compressed = await imageCompression(file, {
+      maxSizeMB: 1,          // target 1MB
+      maxWidthOrHeight: 1024 // riduce immagini enormi
+    });
+
+    // --- CROP 1:1 ---
+    const cropped = await cropToSquare(compressed);
+
     const fileExt = file.name.split(".").pop();
     const fileName = `${user.id}.${fileExt}`;
     const filePath = `avatars/${fileName}`;
 
-    // Upload su storage
     let { error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(filePath, file, { upsert: true });
+      .upload(filePath, cropped, { upsert: true });
 
     if (uploadError) {
       console.error(uploadError);
-      showToast("Errore durante il caricamento dell’immagine", "error");
+      showToast("Errore durante il caricamento", "error");
       return;
     }
 
-    // Prende URL pubblico
     const { data: urlData } = supabase.storage
       .from("avatars")
       .getPublicUrl(filePath);
 
     const publicUrl = urlData.publicUrl;
 
-    // Aggiorna DB
     const { error } = await supabase
       .from("profiles")
       .update({ avatar_url: publicUrl })
       .eq("id", user.id);
 
     if (error) {
-      showToast("Errore durante l’aggiornamento del profilo", "error");
+      showToast("Errore durante l’aggiornamento", "error");
       return;
     }
 
-    // Aggiorna il context (UI immediata)
-    setProfile((prev) => ({
-      ...prev,
-      avatar_url: publicUrl,
-    }));
-
+    setProfile((prev) => ({ ...prev, avatar_url: publicUrl }));
     showToast("Foto aggiornata!", "success");
   }
 
@@ -163,4 +172,36 @@ export default function ProfileComponent() {
       </button>
     </div>
   );
+}
+
+async function cropToSquare(imageFile) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(imageFile);
+
+    img.onload = () => {
+      const size = Math.min(img.width, img.height);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(
+        img,
+        (img.width - size) / 2,
+        (img.height - size) / 2,
+        size,
+        size,
+        0,
+        0,
+        size,
+        size
+      );
+
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, "image/jpeg", 0.9);
+    };
+  });
 }

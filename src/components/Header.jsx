@@ -1,11 +1,19 @@
 import styles from "./Header.module.css";
 import { User as UserIcon } from "lucide-react";
 import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import { usePostContext } from "../context/PostContext";
 
-export default function Header({ onProfileClick }) {
-  const { user } = useUser();
-  const avatarUrl = user?.user_metadata?.avatar_url;
+export default function Header() {
+  const { user, profile } = useUser();
+  const avatarUrl = profile?.avatar_url;
   const username = user?.user_metadata?.username;
+
+  const navigate = useNavigate();
+
+  const onProfileClick = () =>{
+    navigate("/profile");
+  }
 
   return (
     <header className={styles.header}>

@@ -1,11 +1,11 @@
 import Header from "../components/Header";
-import TopTabs from "../components/TopTabs";
 import styles from "./Home.module.css";
 import Post from "../components/Post";
 
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import PostSkeleton from "../components/PostSkeleton";
+import { usePostContext } from "../context/PostContext";
 
 const mockPost = 
   {
@@ -36,6 +36,7 @@ const mockPost =
 export default function Home() {
 
   const [posts, setPosts] = useState([]);
+  const { lastCreatedPost } = usePostContext();
   const [loading, setLoading] = useState(true);
 
   const loadPosts = async () => {
@@ -68,6 +69,15 @@ export default function Home() {
     setTimeout(()=>{setLoading(false)}, 1000)
   };
 
+  function handlePostCreated(newPost) {
+    setPosts(prev => [newPost, ...prev]);
+  }
+
+   useEffect(() => {
+    if (lastCreatedPost) {
+      setPosts(prev => [lastCreatedPost, ...prev]);
+    }
+  }, [lastCreatedPost]);
 
   useEffect(() => {
     loadPosts();
