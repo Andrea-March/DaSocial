@@ -25,58 +25,95 @@ export default function ProfileComponent() {
   };
 
   async function handleFileChange(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-    // --- LIMITE MAX 3MB ---
-    const MAX_SIZE_MB = 3;
-    if (file.size / 1024 / 1024 > MAX_SIZE_MB) {
-      showToast("L'immagine è troppo grande (max 3MB)", "error");
-      return;
-    }
+  // --- LIMITE MAX 10 MB ---
+  const MAX_SIZE_MB = 10;
+  if (file.size / 1024 / 1024 > MAX_SIZE_MB) {
+    showToast("L'immagine è troppo grande (max 10MB)", "error");
+    return;
+  }
 
-    // --- COMPRESSIONE ---
-    const compressed = await imageCompression(file, {
-      maxSizeMB: 1,          // target 1MB
-      maxWidthOrHeight: 1024 // riduce immagini enormi
+  // --- COMPRESSIONE ---
+  const compressed = await imageCompression(file, {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1024,
+  });
+
+  // --- CROP 1:1 ---
+  const cropped = await cropToSquare(compressed);
+
+  // --- Genera nuovo filePath ---
+  const fileExt = "webp"; // meglio forzare sempre webp dopo compressione
+  const fileName = `${user.id}.${fileExt}`;
+  const filePath = `avatars/${fileName}`;
+
+  // --- 1) Recupera il vecchio avatar ---
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("id", user.id)
+    .single();
+
+  const oldUrl = profileData?.avatar_url;
+  let oldPath = null;
+
+  if (oldUrl) {
+    // Estrai solo "<folder>/<filename>"
+    const parts = oldUrl.split("/storage/v1/object/public/avatars/");
+    if (parts[1]) oldPath = "avatars/" + parts[1];
+  }
+
+  // --- 2) Upload nuovo avatar ---
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(filePath, cropped, {
+      upsert: true,
+      contentType: "image/webp",
     });
 
-    // --- CROP 1:1 ---
-    const cropped = await cropToSquare(compressed);
-
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${user.id}.${fileExt}`;
-    const filePath = `avatars/${fileName}`;
-
-    let { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, cropped, { upsert: true });
-
-    if (uploadError) {
-      console.error(uploadError);
-      showToast("Errore durante il caricamento", "error");
-      return;
-    }
-
-    const { data: urlData } = supabase.storage
-      .from("avatars")
-      .getPublicUrl(filePath);
-
-    const publicUrl = urlData.publicUrl;
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({ avatar_url: publicUrl })
-      .eq("id", user.id);
-
-    if (error) {
-      showToast("Errore durante l’aggiornamento", "error");
-      return;
-    }
-
-    setProfile((prev) => ({ ...prev, avatar_url: publicUrl }));
-    showToast("Foto aggiornata!", "success");
+  if (uploadError) {
+    console.error(uploadError);
+    showToast("Errore durante il caricamento", "error");
+    return;
   }
+
+  // --- 3) Se esiste il vecchio avatar → cancellalo ---
+  if (oldPath && oldPath !== filePath) {
+    const { error: deleteError } = await supabase.storage
+      .from("avatars")
+      .remove([oldPath]);
+
+    if (deleteError) {
+      console.warn("Impossibile eliminare il vecchio avatar:", deleteError);
+      // Non blocchiamo l'utente per un errore di pulizia
+    }
+  }
+
+  // --- 4) Ottieni nuovo URL pubblico ---
+  const { data: urlData } = supabase.storage
+    .from("avatars")
+    .getPublicUrl(filePath);
+
+  const publicUrl = urlData.publicUrl;
+
+  // --- 5) Aggiorna profilo ---
+  const { error } = await supabase
+    .from("profiles")
+    .update({ avatar_url: publicUrl })
+    .eq("id", user.id);
+
+  if (error) {
+    showToast("Errore durante l’aggiornamento", "error");
+    return;
+  }
+
+  // --- 6) Aggiorna stato ---
+  setProfile((prev) => ({ ...prev, avatar_url: publicUrl }));
+  showToast("Foto aggiornata!", "success");
+}
+
 
   // --- SALVATAGGIO BIO + CLASSE & SEZIONE ---
   async function handleSave() {

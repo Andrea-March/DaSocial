@@ -15,7 +15,7 @@ export default function Profile() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
-      setTimeout(()=>{setLoading(false)}, 1000);
+      setLoading(false);
     }).catch((err)=>{setLoading(false); console.log(err)});
   }, []);
 

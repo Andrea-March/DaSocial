@@ -66,7 +66,7 @@ export default function Home() {
 
     setPosts(data);
     /* wait one second because setPosts takes time */
-    setTimeout(()=>{setLoading(false)}, 1000)
+    setLoading(false);
   };
 
   function handlePostCreated(newPost) {

@@ -41,8 +41,8 @@ export default function Post({ post }) {
       <div className={styles.content}>{post.content}</div>
 
       {/* IMAGE */}
-      {post.image && (
-        <img className={styles.image} src={post.image} alt="" />
+      {post.image_url && (
+        <img className={styles.image} src={post.image_url} alt="" />
       )}
 
       {/* ACTIONS */}
