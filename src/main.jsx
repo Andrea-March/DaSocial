@@ -7,6 +7,8 @@ import './styles/colors.css'
 import './styles/global.css'
 
 import { registerSW } from 'virtual:pwa-register'
+import { UserProvider } from "./context/UserContext";
+import { ToastProvider } from "./context/ToastContext";
 
 registerSW({
   onNeedRefresh() {},
@@ -15,6 +17,10 @@ registerSW({
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <App />
+    <UserProvider >
+      <ToastProvider >
+        <App />
+      </ToastProvider>
+    </UserProvider >
   </BrowserRouter>
 );

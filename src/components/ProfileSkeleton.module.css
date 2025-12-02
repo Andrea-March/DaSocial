@@ -1,0 +1,110 @@
+/* PALETTE RICORDATA:
+   --color-gray-xlight = #f5f5f5 (uso come blocco base)
+   --color-gray-light = #e5e5e5 (contorni / blocchi)
+*/
+
+.container {
+  padding: 16px;
+  animation: pulse 1.6s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.45; }
+  100% { opacity: 1; }
+}
+
+/* TITLE */
+.title {
+  width: 140px;
+  height: 22px;
+  background: var(--color-gray-light);
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+/* AVATAR */
+.avatarWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--color-gray-light);
+}
+
+/* CAMBIA FOTO */
+.changePhoto {
+  width: 100px;
+  height: 14px;
+  background: var(--color-gray-xlight);
+  border-radius: 4px;
+  margin: 0 auto 20px auto;
+}
+
+/* CARD */
+.card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.label {
+  width: 80px;
+  height: 13px;
+  background: var(--color-gray-light);
+  border-radius: 4px;
+  margin-top: 12px;
+}
+
+.value {
+  width: 160px;
+  height: 16px;
+  background: var(--color-gray-light);
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+/* BIO TEXTAREA */
+.textArea {
+  width: 100%;
+  height: 70px;
+  background: var(--color-gray-light);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+/* CLASSE & SEZIONE */
+.row {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.column {
+  flex: 1;
+}
+
+.input {
+  width: 100%;
+  height: 36px;
+  background: var(--color-gray-light);
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+/* SAVE BUTTON */
+.saveButton {
+  width: 100%;
+  height: 44px;
+  background: var(--color-gray-light);
+  border-radius: 10px;
+  margin-top: 4px;
+}

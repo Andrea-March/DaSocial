@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useUser } from "../context/UserContext";
 import styles from "./NewPost.module.css";
 import { X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 
 export default function NewPost({ onClose }) {
-  const [user, setUser] = useState(null);
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const MAX_CHARS = 500;
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-        setUser(data.user);
-    });
-  }, []);
+  const { user } = useUser();
 
   const handleImage = (e) => {
     const file = e.target.files[0];

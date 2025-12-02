@@ -56,16 +56,16 @@ export default function Home() {
       )
     `)
     .order("created_at", { ascending: false });
-    console.log(error)
-
 
     if (error) {
       console.error(error);
+      setLoading(false);
       return;
     }
 
     setPosts(data);
-    setLoading(false);
+    /* wait one second because setPosts takes time */
+    setTimeout(()=>{setLoading(false)}, 1000)
   };
 
 
@@ -77,10 +77,10 @@ export default function Home() {
   return (
     <div className={styles.container}>
         <Header />
-        <TopTabs />
+       {/*  <TopTabs /> */}
 
         <div className={styles.content}>
-            {posts.length === 0 ? (
+            {posts.length === 0 && !loading ? (
                     <div className={styles.emptyState}>
                         <p className={styles.title}>Nessun post ancora.</p>
                         <p className={styles.subtitle}>Premi il + in basso per crearne uno.</p>
