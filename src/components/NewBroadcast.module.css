@@ -1,0 +1,160 @@
+/* OVERLAY — identico al NewPost */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+/* CONTAINER — identico al NewPost */
+.container {
+  background: var(--bg-main);
+  width: 100%;
+  height: 100%;
+  padding-top: 20px;
+  overflow-y: auto;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cancel {
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.publish {
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* TITLE INPUT */
+.titleInput {
+  width: 100%;
+  padding: 16px;
+  padding-bottom: 8px;
+  border: none;
+  background: none;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.titleInput:focus {
+  outline: none;
+}
+
+/* TEXTAREA */
+.textarea {
+  width: 100%;
+  height: 140px;
+  padding: 16px;
+  border: none;
+  font-size: 16px;
+  color: var(--text-primary);
+  resize: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.textarea:focus {
+  outline: none;
+}
+
+/* SWITCH PINNED */
+.switchRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.switchRow input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* IMAGE SECTION */
+.imageSection {
+  padding: 16px;
+}
+
+/* UPLOAD BUTTON — identico al NewPost */
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+/* IMAGE PREVIEW — identico al NewPost */
+.imagePreview {
+  width: 100%;
+  max-height: 70vh;
+  border: 1px solid var(--border-color);
+  margin-bottom: 12px;
+}
+
+.previewWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* CHANGE IMAGE */
+.changeImage {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 13px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* REMOVE IMAGE */
+.removeImage {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.65);
+  color: white;
+  font-size: 15px;
+  padding: 4px 8px;
+  cursor: pointer;
+}

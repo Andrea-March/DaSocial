@@ -8,7 +8,7 @@ import { supabase } from "../lib/supabaseClient";
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useUser();
-  const [hasLiked, setHasLiked] = useState(post.post_likes.length > 0);
+  const [hasLiked, setHasLiked] = useState(post.post_likes?.length > 0);
   const [likeCount, setLikeCount] = useState(post.like_count);
 
   async function toggleLike(postId, hasLiked) {
@@ -87,7 +87,7 @@ export default function Post({ post }) {
       <div className={styles.actions}>
         <div className={styles.action} onClick={handleLike}>
           <Heart 
-            size={18}
+            size={20}
             fill={hasLiked ? "red" : "none"}
             stroke={hasLiked ? "red" : "currentColor"}
             className={hasLiked ? styles.heartLiked : ""}
@@ -96,7 +96,7 @@ export default function Post({ post }) {
         </div>
 
         <div className={styles.action}>
-          <MessageSquare size={18} />
+          <MessageSquare size={20} />
           <span className={styles.count}>{post.comments?.length}</span>
         </div>
       </div>

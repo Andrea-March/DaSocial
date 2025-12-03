@@ -10,7 +10,10 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     async function load() {
-      const userId = user?.id;
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
       setUser(authUser);
 
       if (authUser) {
@@ -28,7 +31,6 @@ export function UserProvider({ children }) {
 
     load();
 
-    // update on login/logout
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null;
       setUser(u);
@@ -48,8 +50,13 @@ export function UserProvider({ children }) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
+  function canPublishBroadcast() {
+    if (!profile) return false;
+    return profile.role === "admin" || profile.is_representative === true;
+  }
+
   return (
-    <UserContext.Provider value={{ user, profile, setProfile, loading }}>
+    <UserContext.Provider value={{ user, profile, setProfile, loading, canPublishBroadcast }}>
       {children}
     </UserContext.Provider>
   );

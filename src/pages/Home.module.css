@@ -1,6 +1,8 @@
 .container {
   padding-bottom: 60px; /* spazio per bottom bar */
   background: var(--bg-main);
+  max-width: 650px;
+  justify-self: center;
 }
 
 .emptyState {
