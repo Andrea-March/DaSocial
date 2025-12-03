@@ -54,7 +54,8 @@ export default function Home() {
       profiles (
         username,
         avatar_url
-      )
+      ),
+      post_likes!left (user_id)
     `)
     .order("created_at", { ascending: false });
 

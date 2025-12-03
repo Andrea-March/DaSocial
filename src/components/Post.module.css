@@ -77,23 +77,48 @@
 /* ACTIONS */
 .actions {
   display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 18px;
   margin-top: 6px;
+  margin-bottom: 12px;
   color: var(--text-secondary);
-  opacity: 0.9;
 }
 
 .action {
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: var(--text-secondary);
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 6px; /* più zona cliccabile */
+  border-radius: 6px;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.action:hover {
+  background: rgba(0, 0, 0, 0.06); /* leggerissimo highlight */
 }
 
 .action:active {
   opacity: 0.6;
 }
+
+.count {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Animazione "pop" per il cuore */
+.heartLiked {
+  animation: pop 0.22s ease-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  50% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
 
 /* COMMENTS */
 .comments {

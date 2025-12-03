@@ -10,8 +10,7 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.auth.getUser();
-      const authUser = data?.user || null;
+      const userId = user?.id;
       setUser(authUser);
 
       if (authUser) {

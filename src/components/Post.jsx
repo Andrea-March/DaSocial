@@ -2,9 +2,47 @@ import styles from "./Post.module.css";
 import { Heart, MessageSquare, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import { timeAgo } from "../lib/timeAgo";
+import { useUser } from "../context/UserContext";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useUser();
+  const [hasLiked, setHasLiked] = useState(post.post_likes.length > 0);
+  const [likeCount, setLikeCount] = useState(post.like_count);
+
+  async function toggleLike(postId, hasLiked) {
+    const userId = user?.id;
+    if (!userId) return;
+
+    if (!hasLiked) {
+      await supabase.from("post_likes").insert({
+        post_id: postId,
+        user_id: userId
+      });
+
+      await supabase.rpc("increment_like", { post_uuid: postId });
+    } else {
+      await supabase
+        .from("post_likes")
+        .delete()
+        .match({ post_id: postId, user_id: userId });
+
+      await supabase.rpc("decrement_like", { post_uuid: postId });
+    }
+  }
+
+  async function handleLike() {
+    if (!hasLiked) {
+      await toggleLike(post.id, false);
+      setHasLiked(true);
+      setLikeCount(likeCount + 1);
+    } else {
+      await toggleLike(post.id, true);
+      setHasLiked(false);
+      setLikeCount(likeCount - 1);
+    }
+  }
 
   return (
     <div className={styles.post}>
@@ -47,13 +85,19 @@ export default function Post({ post }) {
 
       {/* ACTIONS */}
       <div className={styles.actions}>
-        <div className={styles.action}>
-          <Heart size={18} />
-          <span>{post.likes}</span>
+        <div className={styles.action} onClick={handleLike}>
+          <Heart 
+            size={18}
+            fill={hasLiked ? "red" : "none"}
+            stroke={hasLiked ? "red" : "currentColor"}
+            className={hasLiked ? styles.heartLiked : ""}
+          />
+          <span className={styles.count}>{likeCount}</span>
         </div>
+
         <div className={styles.action}>
           <MessageSquare size={18} />
-          <span>{post.comments?.length}</span>
+          <span className={styles.count}>{post.comments?.length}</span>
         </div>
       </div>
 
