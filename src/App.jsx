@@ -9,14 +9,11 @@ import Broadcast from './pages/Broadcast'
 import Market from './pages/Market'
 import BottomNav from './components/BottomNav'
 import Profile from "./pages/Profile";
-import NewPost from "./components/NewPost";
-import { usePostContext } from "./context/PostContext";
 
 
 export default function App() {
   const location = useLocation();
 
-  const { showNewPost, closeNewPost } = usePostContext();
 
   // Mostriamo la BottomNav solo nelle pagine interne
   const hideBottomNav = 
@@ -68,10 +65,6 @@ export default function App() {
           }
         />
       </Routes>
-
-      {showNewPost && (
-        <NewPost onClose={closeNewPost} />
-      )}
       {!hideBottomNav && <BottomNav />}
       
     </>

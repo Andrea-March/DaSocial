@@ -3,7 +3,7 @@
   background: white;
   border-radius: 16px;
   margin-bottom: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.1);
   border: none; 
 }
 
@@ -101,6 +101,19 @@
 
 .action:active {
   opacity: 0.6;
+}
+
+.menuItemDelete {
+  padding: 12px 14px;
+  font-size: 15px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.menuItemDelete:hover {
+  opacity: 0.75;
 }
 
 .count {

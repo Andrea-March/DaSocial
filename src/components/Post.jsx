@@ -4,12 +4,15 @@ import { useState } from "react";
 import { timeAgo } from "../lib/timeAgo";
 import { useUser } from "../context/UserContext";
 import { supabase } from "../lib/supabaseClient";
+import { usePostContext } from "../context/PostContext";
 
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useUser();
   const [hasLiked, setHasLiked] = useState(post.post_likes?.length > 0);
   const [likeCount, setLikeCount] = useState(post.like_count);
+
+  const { openEditPost, openDeletePost } = usePostContext();
 
   async function toggleLike(postId, hasLiked) {
     const userId = user?.id;
@@ -44,6 +47,7 @@ export default function Post({ post }) {
     }
   }
 
+ 
   return (
     <div className={styles.post}>
 
@@ -69,10 +73,27 @@ export default function Post({ post }) {
       </div>
 
       {/* POST MENU */}
-      {menuOpen && (
+      {menuOpen && user?.id !== post.user_id && (
         <div className={styles.menu}>
           <div className={styles.menuItem}>Segnala</div>
           <div className={styles.menuItem}>Nascondi</div>
+        </div>
+      )}
+      {menuOpen && user?.id === post.user_id && (
+        <div className={styles.menu}>
+          <div
+            className={styles.menuItem}
+            onClick={() => openEditPost(post)}
+          >
+            Modifica
+          </div>
+
+          <button 
+            className={styles.menuItemDelete}
+            onClick={() => openDeletePost(post)}
+          >
+            Elimina
+          </button>
         </div>
       )}
       {/* TEXT */}

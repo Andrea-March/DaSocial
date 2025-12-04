@@ -22,4 +22,9 @@
   --bg-main: var(--color-white);
   --bg-subtle: var(--color-gray-xlight);
   --accent: var(--color-accent);
+  --danger-bg: rgba(255, 59, 48, 0.1);
+  --danger-bg-hover: rgba(255, 59, 48, 0.15);
+  --danger: #ff3b30;      
+  --danger-fg: #ffffff;
+
 }

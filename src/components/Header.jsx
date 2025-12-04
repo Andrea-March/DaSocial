@@ -2,7 +2,6 @@ import styles from "./Header.module.css";
 import { User as UserIcon } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { usePostContext } from "../context/PostContext";
 
 export default function Header() {
   const { user, profile } = useUser();

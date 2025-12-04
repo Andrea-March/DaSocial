@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import styles from "./NewPost.module.css";
 import { X, Image as ImageIcon } from "lucide-react";
@@ -7,7 +7,7 @@ import { usePostContext } from "../context/PostContext";
 import imageCompression from "browser-image-compression";
 import { useToast } from "../context/ToastContext";
 
-export default function NewPost({ onClose }) {
+export default function NewPost({ onClose, postToEdit }) {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const MAX_CHARS = 500;
@@ -16,9 +16,16 @@ export default function NewPost({ onClose }) {
 
   const { showToast } = useToast();
 
-  const { triggerPostCreated } = usePostContext();
+  const { triggerPostCreated, triggerPostUpdated } = usePostContext();
 
   const { user } = useUser();
+
+  useEffect(() => {
+    if (postToEdit) {
+      setText(postToEdit.content || "");
+      setImagePreview(postToEdit.image_url || null);
+    }
+  }, [postToEdit]);
 
   const handleImage = (e) => {
     const file = e.target.files[0];
@@ -27,6 +34,80 @@ export default function NewPost({ onClose }) {
     }
   };
 
+  function extractPath(url) {
+    // Prende tutto dopo "public/{bucket}/"
+    const match = url.match(/public\/([^/]+)\/(.+)$/);
+
+    if (!match) return null;
+
+    // match[1] = bucket ("posts")
+    // match[2] = internal path ("posts/filename.webp")
+    return match[2];
+  }
+
+  async function handleUpdatePost() {
+    if (!user || user.id !== postToEdit.user_id) {
+      showToast("Non hai i permessi per modificare questo post", "error");
+      return;
+    }
+
+    let newImageUrl = postToEdit.image_url;
+    let oldImagePath = null;
+
+    // Se immagine rimossa
+    if (!imagePreview && postToEdit.image_url) {
+      oldImagePath = extractPath(postToEdit.image_url);
+      newImageUrl = null;
+    }
+
+    // Se immagine cambiata
+    if (imagePreview && fileInputRef.current?.files?.[0]) {
+      if (postToEdit.image_url) {
+        oldImagePath = extractPath(postToEdit.image_url);
+      }
+
+      const file = fileInputRef.current.files[0];
+
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1280,
+        fileType: "image/webp",
+        useWebWorker: true
+      });
+
+      const newName = `${user.id}_${Date.now()}.webp`;
+      const filePath = `posts/${newName}`;
+
+      const finalFile = new File([compressed], newName, { type: "image/webp" });
+
+      await supabase.storage.from("posts").upload(filePath, finalFile);
+
+      const { data } = supabase.storage.from("posts").getPublicUrl(filePath);
+      newImageUrl = data.publicUrl;
+    }
+
+    // UPDATE con funzione postgres definita su supabase che ritorna l'intero post per aggiornare correttamente il feed
+   const { data, error } = await supabase.rpc("update_post_get_full", {
+      pid: postToEdit.id,
+      new_content: text,
+      new_image_url: newImageUrl
+    });
+
+    if (error) {
+      showToast("Errore nell'aggiornamento", "error");
+      return;
+    }
+
+    // Rimuovi vecchia immagine
+    if (oldImagePath) {
+      await supabase.storage.from("posts").remove([oldImagePath]);
+    }
+
+    triggerPostUpdated(data);
+
+    onClose();
+  }
+  
 const handlePost = async () => {
   if (!text.trim()) {
     showToast("Scrivi qualcosa prima di pubblicare!", "error");
@@ -124,6 +205,7 @@ const handlePost = async () => {
 
   // --- 7) RESET UI ---
   setImagePreview(null);
+  setPostBeingEdited(null);
   setText("");
   onClose();
 };
@@ -138,9 +220,17 @@ const handlePost = async () => {
           <span className={styles.title}>Nuovo post</span>
           <span 
             className={`${styles.publish} ${text.length === 0 ? styles.disabled : ""}`} 
-            onClick={text.length === 0 ? undefined : handlePost}
+            onClick={
+              text.trim().length === 0
+                ? undefined
+                : postToEdit
+                  ? handleUpdatePost
+                  : handlePost
+            }
           >
-            Pubblica
+            <span className={styles.publish}>
+              {postToEdit ? "Salva" : "Pubblica"}
+            </span>
           </span>
         </div>
 

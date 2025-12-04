@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import PostSkeleton from "../components/PostSkeleton";
 import { usePostContext } from "../context/PostContext";
+import NewPost from "../components/NewPost";
+import DeletePostModal from "../components/DeletePostModal";
 
 const mockPost = 
   {
@@ -38,6 +40,24 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const { lastCreatedPost } = usePostContext();
   const [loading, setLoading] = useState(true);
+  
+  const { showNewPost, closeNewPost, postBeingEdited, showDeletePostModal, postsToDelete, lastUpdatedPost  } = usePostContext();
+
+  useEffect(() => {
+    if (postsToDelete) {
+      setPosts(prev => prev.filter(p => p.id !== postsToDelete));
+    }
+  }, [postsToDelete]);
+
+  useEffect(() => {
+    if (lastUpdatedPost) {
+      setPosts(prev =>
+        prev.map(p => 
+          p.id === lastUpdatedPost.id ? lastUpdatedPost : p
+        )
+      );
+    }
+  }, [lastUpdatedPost]);
 
   const loadPosts = async () => {
     setLoading(true);
@@ -70,9 +90,6 @@ export default function Home() {
     setLoading(false);
   };
 
-  function handlePostCreated(newPost) {
-    setPosts(prev => [newPost, ...prev]);
-  }
 
    useEffect(() => {
     if (lastCreatedPost) {
@@ -110,6 +127,13 @@ export default function Home() {
                     </div>
                 )}
         </div>
+        {showNewPost && (
+          <NewPost
+            postToEdit={postBeingEdited} 
+            onClose={closeNewPost}
+          />
+        )}
+        {showDeletePostModal && <DeletePostModal />}
     </div>
   );
 }
