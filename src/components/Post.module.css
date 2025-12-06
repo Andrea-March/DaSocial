@@ -110,6 +110,7 @@
   background: var(--danger-bg);
   color: var(--danger);
   font-weight: 600;
+  text-align: justify;
 }
 
 .menuItemDelete:hover {

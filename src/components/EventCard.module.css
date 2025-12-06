@@ -1,0 +1,58 @@
+.card {
+  display: flex;
+  gap: 12px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+/* BADGE */
+.dateBadge {
+  width: 50px;
+  height: 58px;
+  background: var(--accent);
+  color: var(--color-white);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.day {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.month {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: -2px;
+}
+
+/* CONTENTO */
+.content {
+  flex: 1;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.image {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 8px;
+}

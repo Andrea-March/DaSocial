@@ -87,7 +87,7 @@ export default function Home() {
 
     setPosts(data);
     /* wait one second because setPosts takes time */
-    setLoading(false);
+    setTimeout(()=>setLoading(false), 500)
   };
 
 

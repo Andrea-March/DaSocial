@@ -12,6 +12,10 @@ export default function NewBroadcast({ onClose, onCreated }) {
   const [content, setContent] = useState("");
   const [pinned, setPinned] = useState(false);
 
+  // --- EVENTO ---
+  const [isEvent, setIsEvent] = useState(false);
+  const [eventDate, setEventDate] = useState("");
+
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -30,6 +34,11 @@ export default function NewBroadcast({ onClose, onCreated }) {
   const handlePublish = async () => {
     if (!title.trim()) {
       showToast("Inserisci un titolo.", "error");
+      return;
+    }
+
+    if (isEvent && !eventDate) {
+      showToast("Se è un evento, devi inserire una data.", "error");
       return;
     }
 
@@ -88,7 +97,8 @@ export default function NewBroadcast({ onClose, onCreated }) {
         content,
         pinned,
         image_url: uploadedImageUrl,
-        author_id: user.id
+        author_id: user.id,
+        event_date: isEvent ? eventDate : null
       })
       .select()
       .single();
@@ -99,7 +109,6 @@ export default function NewBroadcast({ onClose, onCreated }) {
       return;
     }
 
-    // success
     showToast("Broadcast pubblicato!", "success");
 
     onCreated?.(data);
@@ -151,6 +160,26 @@ export default function NewBroadcast({ onClose, onCreated }) {
             onChange={(e) => setPinned(e.target.checked)}
           />
         </label>
+
+        {/* SWITCH EVENTO */}
+        <label className={styles.switchRow}>
+          <span>Questo è un evento</span>
+          <input
+            type="checkbox"
+            checked={isEvent}
+            onChange={(e) => setIsEvent(e.target.checked)}
+          />
+        </label>
+
+        {/* DATA EVENTO */}
+        {isEvent && (
+          <input
+            type="date"
+            className={styles.dateInput}
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
+          />
+        )}
 
         {/* IMMAGINE */}
         <input
