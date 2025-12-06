@@ -1,0 +1,57 @@
+.card {
+  width: 100%;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Linee simulanti titolo e contenuto */
+.title,
+.text,
+.textShort {
+  background: var(--color-gray-xlight);
+  border-radius: 6px;
+  height: 15px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.title {
+  width: 60%;
+}
+
+.text {
+  width: 85%;
+}
+
+.textShort {
+  width: 40%;
+}
+
+/* Effetto shimmer */
+.title::after,
+.text::after,
+.textShort::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.4),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

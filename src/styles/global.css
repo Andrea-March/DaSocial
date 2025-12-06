@@ -32,3 +32,16 @@ body, html {
   background: var(--border-color);
   width: 100%;
 }
+
+.fadeIn {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: fadeInAnim 0.22s ease-out forwards;
+}
+
+@keyframes fadeInAnim {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

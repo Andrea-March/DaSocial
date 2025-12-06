@@ -5,10 +5,14 @@ import styles from "./EventsList.module.css";
 import EventCard from "./EventCard";
 import CalendarView from "./CalendarView";
 import EventsOfDay from "./EventsOfDay";
+import CalendarSkeleton from "./CalendarSkeleton";
+import EventCardSkeleton from "./EventCardSkeleton";
+import SectionDivider from "./SectionDivider";
 
 export default function EventsList({ refreshTrigger }) {
   const [events, setEvents] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadEvents();
@@ -22,23 +26,36 @@ export default function EventsList({ refreshTrigger }) {
       .order("event_date", { ascending: true });
 
     if (!error) setEvents(data);
+    setTimeout(()=>setLoading(false), 500);
   }
 
   return (
     <div className={styles.container}>
-      {events.length === 0 && (
+      {!loading && events.length === 0 && (
         <p className={styles.empty}>Nessun evento in programma.</p>
       )}
-      <CalendarView
-        events={events}  
-        onSelectDay={(d) => setSelectedDate(d)}
-        />
+      {loading ? (
+        <>
+          <CalendarSkeleton />
+          <EventCardSkeleton />
+          <EventCardSkeleton />
+        </>
+      ) : (
+        <div className="fadeIn">
+          <CalendarView events={events} onSelectDay={setSelectedDate} />
 
-        <EventsOfDay date={selectedDate} events={events} />
+          {selectedDate && (
+            <SectionDivider label="Eventi del giorno" />
+          )}
 
-      {events.map(ev => (
-        <EventCard key={ev.id} item={ev} />
-      ))}
+          <EventsOfDay date={selectedDate} events={events} />
+          {selectedDate && <SectionDivider label="Tutti gli eventi" />}
+
+          {events.map(ev => (
+            <EventCard key={ev.id} item={ev} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

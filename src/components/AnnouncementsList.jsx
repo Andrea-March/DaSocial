@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import BroadcastCard from "./BroadcastCard";
 import styles from "./AnnouncementsList.module.css";
+import AnnouncementSkeleton from "./AnnouncementSkeleton";
 
 export default function AnnouncementsList({ refreshTrigger }) {
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadAnnouncements();
@@ -18,7 +20,18 @@ export default function AnnouncementsList({ refreshTrigger }) {
       .order("created_at", { ascending: false });
 
     if (!error) setItems(data);
+    setTimeout(()=> setLoading(false), 500);
   }
+
+    if (loading) {
+      return (
+        <>
+          <AnnouncementSkeleton />
+          <AnnouncementSkeleton />
+          <AnnouncementSkeleton />
+        </>
+      );
+    }
 
   return (
     <div className={styles.container}>
@@ -26,9 +39,11 @@ export default function AnnouncementsList({ refreshTrigger }) {
         <p className={styles.empty}>Nessun annuncio presente.</p>
       )}
 
-      {items.map((item) => (
-        <BroadcastCard key={item.id} broadcast={item} />
-      ))}
+       <div className="fadeIn">
+        {items.map((item) => (
+          <BroadcastCard key={item.id} broadcast={item} variant="icon"/>
+        ))}
+      </div>
     </div>
   );
 }
