@@ -278,7 +278,7 @@ const handlePost = async () => {
                     className={styles.removeImage}
                     onClick={() => setImagePreview(null)}
                   >
-                    X
+                    Rimuovi
                   </span>
             </div>
           ) : (
