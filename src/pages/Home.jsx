@@ -2,44 +2,25 @@ import Header from "../components/Header";
 import styles from "./Home.module.css";
 import Post from "../components/Post";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
 import PostSkeleton from "../components/PostSkeleton";
 import { usePostContext } from "../context/PostContext";
 import NewPost from "../components/NewPost";
 import DeletePostModal from "../components/DeletePostModal";
 
-const mockPost = 
-  {
-    id: 1,
-    author: "Nome Utente",
-    time: "3 ore fa",
-    content: "Testo del post",
-    image: "/mock/photo1.jpg",
-    likes: 12,
-    comments: [
-      {
-        id: 1,
-        author: "Giulia D.",
-        text: "Grazie per l'avviso!",
-        time: "2h fa",
-        replies: [
-          {
-            id: 11,
-            author: "Marco R.",
-            text: "Figurati!",
-            time: "1h fa"
-          }
-        ]
-      }
-    ]
-  };
 
 export default function Home() {
 
-  const [posts, setPosts] = useState([]);
   const { lastCreatedPost } = usePostContext();
+
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [lastDate, setLastDate] = useState(null); // per la paginazione
+  const loaderRef = useRef(null);
+
+  const POSTS_LIMIT = 3;
   
   const { showNewPost, closeNewPost, postBeingEdited, showDeletePostModal, postsToDelete, lastUpdatedPost  } = usePostContext();
 
@@ -59,47 +40,72 @@ export default function Home() {
     }
   }, [lastUpdatedPost]);
 
-  const loadPosts = async () => {
+  const loadPosts = async (initial = false) => {
     setLoading(true);
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select(`
-      id,
-      content,
-      image_url,
-      like_count,
-      created_at,
-      user_id,
-      profiles (
-        username,
-        avatar_url
-      ),
-      post_likes!left (user_id)
-    `)
-    .order("created_at", { ascending: false });
+    let query = supabase
+      .from("posts")
+      .select(`
+        id,
+        content,
+        image_url,
+        like_count,
+        created_at,
+        user_id,
+        profiles (
+          username,
+          avatar_url
+        ),
+        post_likes!left (user_id)
+      `)
+      .order("created_at", { ascending: false })
+      .limit(POSTS_LIMIT);
 
-    if (error) {
-      console.error(error);
-      setLoading(false);
-      return;
-    }
+      if (!initial && lastDate) {
+        query = query.lt("created_at", lastDate);
+      }
 
-    setPosts(data);
-    /* wait one second because setPosts takes time */
-    setTimeout(()=>setLoading(false), 500)
-  };
+      const { data, error } = await query;
+
+      if (error) {
+        console.error(error);
+        setLoading(false);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setPosts(prev => [...prev, ...data]);
+        setLastDate(data[data.length - 1].created_at);
+        if (data.length < 10) setHasMore(false); // finiti i post
+      } else {
+        setHasMore(false);
+      }
+      /* wait one second because setPosts takes time */
+      setTimeout(()=>setLoading(false), 1000)
+    };
 
 
    useEffect(() => {
-    if (lastCreatedPost) {
-      setPosts(prev => [lastCreatedPost, ...prev]);
-    }
-  }, [lastCreatedPost]);
+      if (lastCreatedPost) {
+        setPosts(prev => [lastCreatedPost, ...prev]);
+      }
+    }, [lastCreatedPost]);
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
+    useEffect(() => {
+      loadPosts(true);
+    }, []);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          loadPosts();
+        }
+      });
+
+      if (loaderRef.current) observer.observe(loaderRef.current);
+
+      return () => observer.disconnect();
+    }, [hasMore, loading]);
 
 
   return (
@@ -126,6 +132,7 @@ export default function Home() {
                       )}
                     </div>
                 )}
+                <div ref={loaderRef} />
         </div>
         {showNewPost && (
           <NewPost

@@ -1,16 +1,25 @@
 import styles from "./Post.module.css";
-import { Heart, MessageSquare, MoreVertical } from "lucide-react";
-import { useState } from "react";
+import { Heart, MessageSquare, MoreVertical, Send } from "lucide-react";
+import { useState, useRef, useEffect, use } from "react";
 import { timeAgo } from "../lib/timeAgo";
 import { useUser } from "../context/UserContext";
 import { supabase } from "../lib/supabaseClient";
 import { usePostContext } from "../context/PostContext";
+import { groupComments } from "../lib/groupComments";
 
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useUser();
+  const menuRef = useRef(null);
+  const { user, profile } = useUser();
   const [hasLiked, setHasLiked] = useState(post.post_likes?.length > 0);
   const [likeCount, setLikeCount] = useState(post.like_count);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  
+
+  const [commentText, setCommentText] = useState("");
+  const [replyTo, setReplyTo] = useState(null); // comment id
+
+  const [comments, setComments] = useState([]);
 
   const { openEditPost, openDeletePost } = usePostContext();
 
@@ -46,6 +55,87 @@ export default function Post({ post }) {
       setLikeCount(likeCount - 1);
     }
   }
+ {/* MENU CLOSES ON CLICK OUTSIDE*/}
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
+
+
+useEffect(() => {
+  async function load() {
+      const { data } = await supabase
+        .from("comments")
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          parent_id,
+          profiles (username, avatar_url)
+        `)
+        .eq("post_id", post.id)
+        .order("created_at", { ascending: true });
+
+      setComments(groupComments(data));
+    }
+
+    load();
+}, [post.id]);
+
+async function submitComment() {
+  if (!commentText.trim()) return;
+
+  const { data, error } = await supabase
+    .from("comments")
+    .insert({
+      post_id: post.id,
+      user_id: user.id,
+      content: commentText,
+      parent_id: replyTo ? replyTo.id : null
+    })
+    .select(`
+      id,
+      content,
+      created_at,
+      user_id,
+      parent_id,
+      profiles (username, avatar_url)
+    `)
+    .single();
+
+  if (!error && data) {
+    // 1) Aggiorno la UI locale
+    if (replyTo) {
+      // è una reply
+      setComments(prev =>
+        prev.map(c =>
+          c.id === replyTo.id
+            ? { ...c, replies: [...c.replies, data] }
+            : c
+        )
+      );
+    } else {
+      // è un commento root
+      setComments(prev => [...prev, { ...data, replies: [] }]);
+    }
+
+    // 2) Reset input
+    setCommentText("");
+    setReplyTo(null);
+  }
+}
 
  
   return (
@@ -80,28 +170,53 @@ export default function Post({ post }) {
         </div>
       )}
       {menuOpen && user?.id === post.user_id && (
-        <div className={styles.menu}>
-          <div
-            className={styles.menuItem}
-            onClick={() => openEditPost(post)}
-          >
-            Modifica
-          </div>
+        <>
+          {/* BACKDROP */}
+          <div 
+            className={styles.backdrop} 
+            onClick={() => setMenuOpen(false)}
+          />
 
-          <button 
-            className={styles.menuItemDelete}
-            onClick={() => openDeletePost(post)}
-          >
-            Elimina
-          </button>
-        </div>
-      )}
+          {/* MENU */}
+          <div ref={menuRef} className={`${styles.menu} ${styles.menuOpen}`}>
+              <div
+                className={styles.menuItem}
+                onClick={() => {
+                  openEditPost(post);
+                  setMenuOpen(false);
+                }}
+              >
+                Modifica
+              </div>
+
+              <button
+                className={styles.menuItemDelete}
+                onClick={() => {
+                  openDeletePost(post);
+                  setMenuOpen(false);
+                }}
+              >
+                Elimina
+              </button>
+            </div>
+          </>
+        )}
       {/* TEXT */}
       <div className={styles.content}>{post.content}</div>
 
       {/* IMAGE */}
       {post.image_url && (
-        <img className={styles.image} src={post.image_url} alt="" />
+        <div className={styles.imageWrapper}>
+          {!imgLoaded && <div className={styles.imageSkeleton} />}
+
+          <img
+            src={post.image_url}
+            className={`${styles.image} ${imgLoaded ? styles.loaded : ""}`}
+            loading="lazy"
+            onLoad={() => setImgLoaded(true)}
+            alt=""
+          />
+        </div>
       )}
 
       {/* ACTIONS */}
@@ -117,25 +232,31 @@ export default function Post({ post }) {
         </div>
 
         <div className={styles.action}>
-          <MessageSquare size={20} />
-          <span className={styles.count}>{post.comments?.length}</span>
+          <MessageSquare size={20} stroke={comments?.length ? "var(--color-accent)" : "var(--text-secondary)"}/>
+          <span className={styles.count}>{comments?.length}</span>
         </div>
       </div>
 
       {/* COMMENTS */}
-      {post.comments?.length > 0 && (
+      {comments.length > 0 && (
         <div className={styles.comments}>
-          {post.comments.map((c) => (
+          {comments.map((c) => (
             <div key={c.id} className={styles.comment}>
+              
               {/* Comment main block */}
               <div className={styles.commentHeader}>
-                <div className={styles.avatarSmall}></div>
+                <img src={c.profiles.avatar_url} className={styles.avatarSmall} />
                 <div>
-                  <div className={styles.commentAuthor}>{c.author}</div>
-                  <div className={styles.commentText}>{c.text}</div>
+                  <div className={styles.commentAuthor}>{c.profiles.username}</div>
+                  <div className={styles.commentText}>{c.content}</div>
                   <div className={styles.commentMeta}>
-                      <span>{c.time}</span>
-                      <span className={styles.replyBtn}>Rispondi</span>
+                      <span>{timeAgo(c.created_at)}</span>
+                      <span
+                        className={styles.replyBtn}
+                        onClick={() => setReplyTo(c)}
+                      >
+                        Rispondi
+                      </span>
                   </div>
                 </div>
               </div>
@@ -145,12 +266,12 @@ export default function Post({ post }) {
                 <div className={styles.replies}>
                   {c.replies.map((r) => (
                     <div key={r.id} className={styles.reply}>
-                      <div className={styles.avatarSmall}></div>
+                      <img src={r.profiles.avatar_url} className={styles.avatarSmall} />
                       <div>
-                        <div className={styles.commentAuthor}>{r.author}</div>
-                        <div className={styles.commentText}>{r.text}</div>
+                        <div className={styles.commentAuthor}>{r.profiles.username}</div>
+                        <div className={styles.commentText}>{r.content}</div>
                         <div className={styles.commentMeta}>
-                          <span>{r.time}</span>
+                          <span>{timeAgo(r.created_at)}</span>
                         </div>
                       </div>
                     </div>
@@ -159,8 +280,42 @@ export default function Post({ post }) {
               )}
             </div>
           ))}
+          {/* COMMENT AND REPLY TO SECTION */}
+            <div className={styles.addCommentSection}>
+              {replyTo && (
+                <div className={styles.replyChip}>
+                  <span className={styles.replyLabel}>
+                    Rispondendo a @{replyTo.profiles.username}
+                  </span>
+                  <span className={styles.replyClose} onClick={() => setReplyTo(null)}>×</span>
+                </div>
+              )}
+
+              <div className={styles.addComment}>
+                <img src={profile.avatar_url} className={styles.avatarSmall} />
+
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    placeholder="Aggiungi un commento…"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") submitComment();
+                    }}
+                  />
+
+                  {commentText.trim().length > 0 && (
+                    <button className={styles.sendBtn} onClick={submitComment}>
+                      <Send size={18} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
         </div>
       )}
+      
 
     </div>
   );
