@@ -10,6 +10,7 @@ import { registerSW } from 'virtual:pwa-register'
 import { UserProvider } from "./context/UserContext";
 import { ToastProvider } from "./context/ToastContext";
 import { PostProvider } from "./context/PostContext";
+import { BroadcastProvider } from "./context/broadcastContext";
 
 registerSW({
   onNeedRefresh() {},
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <UserProvider >
       <ToastProvider >
         <PostProvider >
-          <App />
+          <BroadcastProvider >
+            <App />
+          </BroadcastProvider>
         </PostProvider>
       </ToastProvider>
     </UserProvider >

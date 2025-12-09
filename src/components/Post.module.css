@@ -247,57 +247,7 @@
   color: var(--text-secondary);
 }
 
-/* MENU OVERLAY */
 
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.15);
-  z-index: 10;
-  animation: fadeIn 0.15s ease-out forwards;
-}
-
-.menu {
-  position: absolute;
-  right: 8px;
-  background: var(--bg-main);
-  border: 1px solid var(--border-color);
-  width: 140px;
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-
-  opacity: 0;
-  transform: translateY(-4px) scale(0.96);
-  transform-origin: top right;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.12);
-  border-radius: 10px;
-}
-
-.menuItem {
-  padding: 12px 14px;
-  font-size: 15px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.menuOpen {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.menuItem:last-child {
-  border-bottom: none;
-}
-
-.menuItem:hover {
-  background: var(--bg-subtle);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
 
 /*--------- ADD COMMENT AND REPLY TO COMMENT---------------*/

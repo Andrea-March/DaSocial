@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./NewBroadcast.module.css";
 
 import { X, Image as ImageIcon } from "lucide-react";
@@ -6,8 +6,9 @@ import { useUser } from "../context/UserContext";
 import { supabase } from "../lib/supabaseClient";
 import { useToast } from "../context/ToastContext";
 import imageCompression from "browser-image-compression";
+import { useBroadcast } from "../context/broadcastContext";
 
-export default function NewBroadcast({ onClose, onCreated }) {
+export default function NewBroadcast({ onClose, onCreated, broadcastToEdit }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [pinned, setPinned] = useState(false);
@@ -19,12 +20,24 @@ export default function NewBroadcast({ onClose, onCreated }) {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  const { user } = useUser();
+  const { user, canEditBroadcast } = useUser();
   const { showToast } = useToast();
+  const { triggerBroadcastUpdated, closeEditBroadcast } = useBroadcast();
 
   const MAX_TITLE = 100;
   const MAX_CONTENT = 2000;
   const MAX_SIZE_MB = 10;
+
+  useEffect(() => {
+    if (broadcastToEdit) {
+      setTitle(broadcastToEdit.title || "");
+      setContent(broadcastToEdit.content || null);
+      setPinned(broadcastToEdit.pinned);
+      setIsEvent(!!broadcastToEdit.event_date);
+      setEventDate(broadcastToEdit.event_date ?? null);
+      setImagePreview(broadcastToEdit.image_url ?? null);
+    }
+  }, [broadcastToEdit]);
 
   const handleImage = (e) => {
     const file = e.target.files[0];
@@ -115,6 +128,93 @@ export default function NewBroadcast({ onClose, onCreated }) {
     onClose();
   };
 
+  function extractPath(url) {
+    // Prende tutto dopo "public/{bucket}/"
+    const match = url.match(/public\/([^/]+)\/(.+)$/);
+
+    if (!match) return null;
+
+    // match[1] = bucket ("posts")
+    // match[2] = internal path ("posts/filename.webp")
+    return match[2];
+  }
+
+  async function handleUpdateBroadcast() {
+    if (!user) {
+      showToast("Devi essere loggato", "error");
+      return;
+    }
+
+    // Permessi: puoi mettere ruolo admin o canPublishBroadcast()
+    if (!canEditBroadcast()) {
+      showToast("Non hai i permessi per modificare questo broadcast", "error");
+      return;
+    }
+
+    let newImageUrl = broadcastToEdit.image_url;
+    let oldImagePath = null;
+
+    // --- 1. Immagine rimossa ---
+    if (!imagePreview && broadcastToEdit.image_url) {
+      oldImagePath = extractPath(broadcastToEdit.image_url);
+      newImageUrl = null;
+    }
+
+    // --- 2. Immagine cambiata ---
+    if (imagePreview && fileInputRef.current?.files?.[0]) {
+      // Se esiste un'immagine precedente -> la elimineremo dopo
+      if (broadcastToEdit.image_url) {
+        oldImagePath = extractPath(broadcastToEdit.image_url);
+      }
+
+      const file = fileInputRef.current.files[0];
+
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1280,
+        fileType: "image/webp",
+        useWebWorker: true
+      });
+
+      const newName = `${user.id}_${Date.now()}.webp`;
+      const filePath = `broadcasts/${newName}`;
+
+      const finalFile = new File([compressed], newName, { type: "image/webp" });
+
+      await supabase.storage.from("broadcasts").upload(filePath, finalFile);
+
+      const { data } = supabase.storage.from("broadcasts").getPublicUrl(filePath);
+      newImageUrl = data.publicUrl;
+    }
+
+    // --- 3. UPDATE via funzione custom che ritorna il broadcast completo ---
+   const { data, error } = await supabase.rpc("update_broadcast_get_full", {
+      bid: broadcastToEdit.id,
+      new_title: title,
+      new_content: content,
+      new_image_url: newImageUrl,
+      new_event_date: eventDate ?? null,
+      new_pinned: pinned
+    });
+
+    if (error) {
+      console.error(error);
+      showToast("Errore nell'aggiornamento del broadcast", "error");
+      return;
+    }
+
+    // --- 4. Rimuovi vecchia immagine se necessario ---
+    if (oldImagePath) {
+      await supabase.storage.from("broadcasts").remove([oldImagePath]);
+    }
+
+    // --- 5. Notifica il feed ---
+    triggerBroadcastUpdated(data);
+
+    closeEditBroadcast();
+  }
+
+
   return (
     <div className={styles.overlay}>
       <div className={styles.container}>
@@ -127,9 +227,9 @@ export default function NewBroadcast({ onClose, onCreated }) {
             className={`${styles.publish} ${
               title.trim() === "" ? styles.disabled : ""
             }`}
-            onClick={title.trim() === "" ? undefined : handlePublish}
+            onClick={title.trim() === "" ? undefined : broadcastToEdit ? handleUpdateBroadcast : handlePublish}
           >
-            Pubblica
+            {broadcastToEdit ? "Aggiorna" : "Pubblica"}
           </button>
         </div>
 
@@ -167,7 +267,11 @@ export default function NewBroadcast({ onClose, onCreated }) {
           <input
             type="checkbox"
             checked={isEvent}
-            onChange={(e) => setIsEvent(e.target.checked)}
+            onChange={(e) => {
+              const val = e.target.checked;
+              setIsEvent(val);
+              if (!val) setEventDate(null);
+            }}
           />
         </label>
 

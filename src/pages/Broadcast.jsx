@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
 import { useUser } from "../context/UserContext";
 import { Plus } from "lucide-react";
 import styles from "./Broadcast.module.css";
-import BroadcastCard from "../components/BroadcastCard";
 import NewBroadcast from "../components/NewBroadcast";
 import TopTabs from "../components/TopTabs";
 import AnnouncementsList from "../components/AnnouncementsList";
 import EventsList from "../components/EventsList";
+import { useBroadcast } from "../context/broadcastContext";
 
 export default function Broadcast() {
   const [lastCreatedBroadcast, setLastCreatedBroadcast] = useState(null);
@@ -15,7 +14,7 @@ export default function Broadcast() {
   const {profile, canPublishBroadcast} = useUser();
   const [tab, setTab] = useState("announcements");
 
-
+  const {broadcastBeingEdited, showEditBroadcast, closeEditBroadcast, setLastUpdatedBroadcast} = useBroadcast();
 
   return (
     <div className={styles.container}>
@@ -55,6 +54,17 @@ export default function Broadcast() {
             setLastCreatedBroadcast(newB);
             setShowModal(false);
           }}
+        />
+      )}
+      {showEditBroadcast && (
+        <NewBroadcast
+          onClose={() => closeEditBroadcast()}
+          onCreated={(newB) => {
+            // Aggiorna lista senza ricaricare pagina
+            setLastUpdatedBroadcast(newB);
+            closeEditBroadcast();
+          }}
+          broadcastToEdit={broadcastBeingEdited}
         />
       )}
     </div>

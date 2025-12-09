@@ -1,9 +1,16 @@
 import styles from "./BroadcastCard.module.css";
-import { Megaphone, CalendarDays, Pin } from "lucide-react";
+import { Megaphone, CalendarDays, Pin, MoreVertical } from "lucide-react";
 import { timeAgo } from "../lib/timeAgo";
+import { useState } from "react";
+import { useUser } from "../context/UserContext";
+import { useBroadcast } from "../context/broadcastContext";
+import ActionMenu from "./ActionMenu";
 
 export default function BroadcastCard({ broadcast, variant = "minimal" }) {
   const { title, content, image_url, created_at, event_date, pinned } = broadcast;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const {openEditBroadcast, openDeleteBroadcast, triggerBroadcastDeleted, closeDeleteBroadcast} = useBroadcast();
+  const { canEditBroadcast } = useUser();
 
   const howLongAgo = timeAgo(created_at);
   const isEvent = !!event_date;
@@ -16,6 +23,46 @@ export default function BroadcastCard({ broadcast, variant = "minimal" }) {
       month: "short"
     });
   }
+
+  
+    async function handleDeleteBroadcast() {
+      if (!canPublishBroadcast()) {
+        showToast("Non hai i permessi per eliminare questo broadcast", "error");
+        return;
+      }
+  
+      const broadcast = broadcastBeingDeleted;
+  
+      // 1. Salviamo path immagine se esiste
+      let oldImagePath = null;
+      if (broadcast.image_url) {
+        oldImagePath = extractPath(broadcast.image_url);
+      }
+  
+      // 2. DELETE broadcast da database
+      const { error } = await supabase
+        .from("broadcasts")
+        .delete()
+        .eq("id", broadcast.id);
+  
+      if (error) {
+        console.error(error);
+        showToast("Errore nella cancellazione", "error");
+        return;
+      }
+  
+      // 3. Rimuovi immagine se presente
+      if (oldImagePath) {
+        await supabase.storage.from("broadcasts").remove([oldImagePath]);
+      }
+  
+      // 4. Notifica feed
+      triggerBroadcastDeleted(broadcast.id);
+  
+      showToast("Broadcast eliminato", "success");
+  
+      closeDeleteBroadcast();
+    }
 
   return (
     <div
@@ -36,6 +83,32 @@ export default function BroadcastCard({ broadcast, variant = "minimal" }) {
         <div className={styles.header}>
             <div className={styles.title}>{title}</div>
           <div className={styles.time}>{howLongAgo}</div>
+          {/* EDIT SECTION */}
+              {canEditBroadcast && (
+                <MoreVertical
+                  className={styles.menuIcon}
+                  onClick={() => setMenuOpen(true)}
+                />
+              )}
+
+              {menuOpen && canEditBroadcast && (
+                <ActionMenu
+                  open={menuOpen}
+                  onClose={() => setMenuOpen(false)}
+                  actions={[
+                    {
+                      label: "Modifica",
+                      onClick: () => openEditBroadcast(broadcast)
+                    },
+                    {
+                      label: "Elimina",
+                      danger: true,
+                      onClick: () => openDeleteBroadcast(broadcast)
+                    }
+                  ]}
+                />
+              )}
+
         </div>
         {(isEvent || pinned) && <div className={styles.metaDivider}></div>}
 
@@ -61,7 +134,7 @@ export default function BroadcastCard({ broadcast, variant = "minimal" }) {
 
           </div>
         )}
-
+        
         {/* CONTENUTO */}
         {content && <div className={styles.content}>{content}</div>}
 

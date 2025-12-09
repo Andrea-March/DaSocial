@@ -6,6 +6,7 @@ import { useUser } from "../context/UserContext";
 import { supabase } from "../lib/supabaseClient";
 import { usePostContext } from "../context/PostContext";
 import { groupComments } from "../lib/groupComments";
+import ActionMenu from "./ActionMenu";
 
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -170,37 +171,22 @@ async function submitComment() {
         </div>
       )}
       {menuOpen && user?.id === post.user_id && (
-        <>
-          {/* BACKDROP */}
-          <div 
-            className={styles.backdrop} 
-            onClick={() => setMenuOpen(false)}
-          />
-
-          {/* MENU */}
-          <div ref={menuRef} className={`${styles.menu} ${styles.menuOpen}`}>
-              <div
-                className={styles.menuItem}
-                onClick={() => {
-                  openEditPost(post);
-                  setMenuOpen(false);
-                }}
-              >
-                Modifica
-              </div>
-
-              <button
-                className={styles.menuItemDelete}
-                onClick={() => {
-                  openDeletePost(post);
-                  setMenuOpen(false);
-                }}
-              >
-                Elimina
-              </button>
-            </div>
-          </>
-        )}
+        <ActionMenu
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          actions={[
+            {
+              label: "Modifica",
+              onClick: () => openEditPost(post)
+            },
+            {
+              label: "Elimina",
+              danger: true,
+              onClick: () => openDeletePost(post)
+            }
+          ]}
+        />
+      )}
       {/* TEXT */}
       <div className={styles.content}>{post.content}</div>
 
@@ -238,9 +224,8 @@ async function submitComment() {
       </div>
 
       {/* COMMENTS */}
-      {comments.length > 0 && (
         <div className={styles.comments}>
-          {comments.map((c) => (
+          {comments?.length > 0  && comments.map((c) => (
             <div key={c.id} className={styles.comment}>
               
               {/* Comment main block */}
@@ -314,7 +299,6 @@ async function submitComment() {
               </div>
             </div>
         </div>
-      )}
       
 
     </div>
