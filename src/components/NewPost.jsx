@@ -34,6 +34,13 @@ export default function NewPost({ onClose, postToEdit }) {
     }
   };
 
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
   function extractPath(url) {
     // Prende tutto dopo "public/{bucket}/"
     const match = url.match(/public\/([^/]+)\/(.+)$/);
@@ -108,107 +115,107 @@ export default function NewPost({ onClose, postToEdit }) {
     onClose();
   }
   
-const handlePost = async () => {
-  if (!text.trim()) {
-    showToast("Scrivi qualcosa prima di pubblicare!", "error");
-    return;
-  }
-
-  if (!user) {
-    showToast("Utente non autenticato.", "error");
-    return;
-  }
-
-  let uploadedImageUrl = null;
-
-  // --- SE C'È UN'IMMAGINE, COMPRESSA E CARICATA ---
-  if (imagePreview) {
-    const file = fileInputRef.current?.files?.[0];
-    if (file && file.size / 1024 / 1024 > MAX_SIZE_MB) {
-      showToast("L'immagine è troppo grande (max 10MB)", "error");
+  const handlePost = async () => {
+    if (!text.trim()) {
+      showToast("Scrivi qualcosa prima di pubblicare!", "error");
       return;
     }
 
-    if (file) {
-      // 🔥 1) Compress + resize
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.5,  
-        maxWidthOrHeight: 1280,
-        fileType: "image/webp",
-        useWebWorker: true
-      });
+    if (!user) {
+      showToast("Utente non autenticato.", "error");
+      return;
+    }
 
-      // 🔥 2) Convert blob in File (per Supabase)
-      const ext = "webp";
-      const fileName = `${user.id}_${Date.now()}.${ext}`;
-      const finalFile = new File([compressed], fileName, { type: "image/webp" });
+    let uploadedImageUrl = null;
 
-      const filePath = `posts/${fileName}`;
-
-      // 🔥 3) Upload su Supabase
-      const { error: uploadError } = await supabase.storage
-        .from("posts")
-        .upload(filePath, finalFile, { upsert: false });
-
-      if (uploadError) {
-        console.error(uploadError);
-        alert("Errore nel caricamento dell'immagine.");
+    // --- SE C'È UN'IMMAGINE, COMPRESSA E CARICATA ---
+    if (imagePreview) {
+      const file = fileInputRef.current?.files?.[0];
+      if (file && file.size / 1024 / 1024 > MAX_SIZE_MB) {
+        showToast("L'immagine è troppo grande (max 10MB)", "error");
         return;
       }
 
-      // 🔥 4) Ottieni URL pubblico
-      const { data: urlData } = supabase.storage
-        .from("posts")
-        .getPublicUrl(filePath);
+      if (file) {
+        // 🔥 1) Compress + resize
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.5,  
+          maxWidthOrHeight: 1280,
+          fileType: "image/webp",
+          useWebWorker: true
+        });
 
-      uploadedImageUrl = urlData.publicUrl;
+        // 🔥 2) Convert blob in File (per Supabase)
+        const ext = "webp";
+        const fileName = `${user.id}_${Date.now()}.${ext}`;
+        const finalFile = new File([compressed], fileName, { type: "image/webp" });
+
+        const filePath = `posts/${fileName}`;
+
+        // 🔥 3) Upload su Supabase
+        const { error: uploadError } = await supabase.storage
+          .from("posts")
+          .upload(filePath, finalFile, { upsert: false });
+
+        if (uploadError) {
+          console.error(uploadError);
+          alert("Errore nel caricamento dell'immagine.");
+          return;
+        }
+
+        // 🔥 4) Ottieni URL pubblico
+        const { data: urlData } = supabase.storage
+          .from("posts")
+          .getPublicUrl(filePath);
+
+        uploadedImageUrl = urlData.publicUrl;
+      }
     }
-  }
 
-  // --- 5) CREA IL POST ---
-  const { data, error } = await supabase
-    .from("posts")
-    .insert({
-      user_id: user.id,
-      content: text,
-      image_url: uploadedImageUrl,
-    })
-    .select();
+    // --- 5) CREA IL POST ---
+    const { data, error } = await supabase
+      .from("posts")
+      .insert({
+        user_id: user.id,
+        content: text,
+        image_url: uploadedImageUrl,
+      })
+      .select();
 
-  if (error) {
-    console.error(error);
-    showToast("Errore nella pubblicazione del post", "error");
-    return;
-  }
+    if (error) {
+      console.error(error);
+      showToast("Errore nella pubblicazione del post", "error");
+      return;
+    }
 
-  const newPostId = data[0].id;
+    const newPostId = data[0].id;
 
-  // --- 6) RELOAD POST COMPLETO (con JOIN sui profiles) ---
-  const { data: fullPost } = await supabase
-    .from("posts")
-    .select(`
-      id,
-      content,
-      image_url,
-      like_count,
-      created_at,
-      user_id,
-      profiles(
-        username,
-        avatar_url
-      )
-    `)
-    .eq("id", newPostId)
-    .single();
+    // --- 6) RELOAD POST COMPLETO (con JOIN sui profiles) ---
+    const { data: fullPost } = await supabase
+      .from("posts")
+      .select(`
+        id,
+        content,
+        image_url,
+        like_count,
+        created_at,
+        user_id,
+        profiles(
+          username,
+          avatar_url
+        )
+      `)
+      .eq("id", newPostId)
+      .single();
 
-  triggerPostCreated(fullPost);
+    triggerPostCreated(fullPost);
 
-  // --- 7) RESET UI ---
-  setImagePreview(null);
-  setPostBeingEdited(null);
-  setText("");
-  onClose();
-};
+    // --- 7) RESET UI ---
+    setImagePreview(null);
+    setPostBeingEdited(null);
+    setText("");
+    onClose();
+  };
 
   return (
     <div className={styles.overlay}>
@@ -276,7 +283,7 @@ const handlePost = async () => {
                   {/* RIMUOVI */}
                   <span
                     className={styles.removeImage}
-                    onClick={() => setImagePreview(null)}
+                    onClick={() => handleRemoveImage()}
                   >
                     Rimuovi
                   </span>
