@@ -70,17 +70,18 @@ export default function BroadcastCard({ broadcast, variant = "minimal" }) {
         variant === "accent" ? styles.accent : ""
       } ${variant === "icon" ? styles.iconVariant : ""}`}
     >
-      {/* ICON VARIANT */}
-      {variant === "icon" && (
-        <div className={styles.iconWrapper}>
-          <Megaphone size={20} className={styles.icon} />
-        </div>
-      )}
+     
 
       <div className={styles.main}>
 
         {/* HEADER: titolo + tempo + pinned */}
         <div className={styles.header}>
+           {/* ICON VARIANT */}
+            {variant === "icon" && (
+              <div className={styles.iconWrapper}>
+                <Megaphone size={20} className={styles.icon} />
+              </div>
+            )}
             <div className={styles.title}>{title}</div>
           <div className={styles.time}>{howLongAgo}</div>
           {/* EDIT SECTION */}

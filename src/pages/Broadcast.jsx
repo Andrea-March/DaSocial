@@ -7,6 +7,7 @@ import TopTabs from "../components/TopTabs";
 import AnnouncementsList from "../components/AnnouncementsList";
 import EventsList from "../components/EventsList";
 import { useBroadcast } from "../context/broadcastContext";
+import Header from "../components/Header";
 
 export default function Broadcast() {
   const [lastCreatedBroadcast, setLastCreatedBroadcast] = useState(null);
@@ -17,56 +18,58 @@ export default function Broadcast() {
   const {broadcastBeingEdited, showEditBroadcast, closeEditBroadcast, setLastUpdatedBroadcast} = useBroadcast();
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Broadcast</h1>
-      <TopTabs
-        tabs={[
-          { label: "Annunci", value: "announcements" },
-          { label: "Eventi", value: "events" }
-        ]}
-        active={tab}
-        onChange={setTab}
-      />
-
-      {tab === "announcements" && (
-        <AnnouncementsList refreshTrigger={lastCreatedBroadcast} />
-      )}
-
-      {tab === "events" && (
-        <EventsList refreshTrigger={lastCreatedBroadcast} />
-      )}
-      <>
-      
-      {profile && canPublishBroadcast() && (
-        <button
-          className={styles.newBroadcastBtn}
-          onClick={() => setShowModal(true)}
-        >
-          <Plus />
-        </button>
-      )}
-      </>
-      {showModal && (
-        <NewBroadcast
-          onClose={() => setShowModal(false)}
-          onCreated={(newB) => {
-            // Aggiorna lista senza ricaricare pagina
-            setLastCreatedBroadcast(newB);
-            setShowModal(false);
-          }}
+    <> 
+      <Header />
+      <div className={styles.container}>
+        <TopTabs
+          tabs={[
+            { label: "Annunci", value: "announcements" },
+            { label: "Eventi", value: "events" }
+          ]}
+          active={tab}
+          onChange={setTab}
         />
-      )}
-      {showEditBroadcast && (
-        <NewBroadcast
-          onClose={() => closeEditBroadcast()}
-          onCreated={(newB) => {
-            // Aggiorna lista senza ricaricare pagina
-            setLastUpdatedBroadcast(newB);
-            closeEditBroadcast();
-          }}
-          broadcastToEdit={broadcastBeingEdited}
-        />
-      )}
-    </div>
+
+        {tab === "announcements" && (
+          <AnnouncementsList refreshTrigger={lastCreatedBroadcast} />
+        )}
+
+        {tab === "events" && (
+          <EventsList refreshTrigger={lastCreatedBroadcast} />
+        )}
+        <>
+        
+        {profile && canPublishBroadcast() && (
+          <button
+            className={styles.newBroadcastBtn}
+            onClick={() => setShowModal(true)}
+          >
+            <Plus />
+          </button>
+        )}
+        </>
+        {showModal && (
+          <NewBroadcast
+            onClose={() => setShowModal(false)}
+            onCreated={(newB) => {
+              // Aggiorna lista senza ricaricare pagina
+              setLastCreatedBroadcast(newB);
+              setShowModal(false);
+            }}
+          />
+        )}
+        {showEditBroadcast && (
+          <NewBroadcast
+            onClose={() => closeEditBroadcast()}
+            onCreated={(newB) => {
+              // Aggiorna lista senza ricaricare pagina
+              setLastUpdatedBroadcast(newB);
+              closeEditBroadcast();
+            }}
+            broadcastToEdit={broadcastBeingEdited}
+          />
+        )}
+      </div>
+    </>
   );
 }
