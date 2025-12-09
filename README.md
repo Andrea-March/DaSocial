@@ -1,87 +1,80 @@
-# 📱 DaSocial
-La piattaforma sociale ufficiale del **Liceo Da Vinci**.  
-App reattiva, minimale e professionale — sviluppata come **PWA** con React + Vite + Supabase.
+# 📱 DaSocial — Social Network Open-Source per le Scuole
 
----
+DaSocial è una piattaforma social moderna pensata per istituti scolastici: feed, post con immagini, broadcast ufficiali, commenti, like, permessi avanzati e integrazione con Supabase.
 
-## 🚀 Caratteristiche principali (MVP)
+Progettata per essere semplice da installare, personalizzabile, e open-source.
 
-### ✔ Autenticazione
-- Login
-- Registrazione con username validato
-- Reset password
-- UI coerente e moderna
-- Pronto per integrazione Supabase Auth
+## ✨ Funzionalità
 
-### ✔ Bacheca
-- Feed post con:
-  - autore
-  - testo
-  - immagini
-  - like
-  - commenti + risposte (1 livello)
-- Mock data già implementati
-- UI minimal, 100% width, stile social moderno
+📰 Feed dei post con immagini, testo e like
 
-### ✔ Design
-- Componenti React + CSS Modules
-- Palette colori “DaSocial” con variabili globali
-- Layout perfetto su mobile
-- Icone `lucide-react`
-- Nessun bordo arrotondato, look professionale
+❤️ Like con contatore in tempo reale
 
-### ✔ PWA-ready
-- `manifest.json`
-- icone PWA
-- service worker via `vite-plugin-pwa`
-- modalità offline
-- installabile su Android / iOS / Desktop
+💬 Commenti (architettura già pronta)
 
----
+📣 Broadcast con permessi per rappresentanti / admin
 
-## 🛠 Stack Tecnologico
+📌 Pin / Unpin dei broadcast
 
-**Frontend**
-- React + Vite
-- CSS Modules
-- lucide-react icons
-- Vite PWA Plugin
+📅 Eventi con data dedicata
 
-**Backend (previsto)**
-- Supabase:
-  - Auth
-  - Database PostgreSQL
-  - Storage (immagini post + documenti)
-  - Policies (RLS)
+🗂 Modali eleganti per edit/delete
 
----
+🖼 Upload immagini con compressione & cleanup automatico
 
+🔐 Supabase (Auth, Storage, RLS avanzate)
 
-## 🧩 To-do Roadmap
-🔥 MVP Core
+⚡ UI moderna e responsive
 
- Integrazione Login + Register con Supabase Auth
+## 🛠 Tech stack
 
- Routing (React Router)
+React + Vite
 
- Creazione post (testo + immagine)
+Supabase (Postgres, Auth, Storage, RLS)
 
- Visualizzazione post da database
+CSS Modules
 
- Sistema di ruoli (studenti / rappresentanti)
+Lucide Icons
 
-🔔 Feature future
+## 🚀 Avvio locale
+### 1️⃣ Clona la repo
+git clone https://github.com/<your-username>/dasocial.git
+cd dasocial
 
- Notifiche push (PWA + Supabase Edge)
+### 2️⃣ Installa le dipendenze
+npm install
 
- Mercatino libri usati
+### 3️⃣ Configura l’ambiente
 
- Broadcast ufficiali dei rappresentanti
+Crea un file .env basato su .env.example:
 
- Moderazione (report, soft delete)
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
 
- Uso codice-classe per registrazione sicura
+### 4️⃣ Avvio in sviluppo
+npm run dev
 
+## 🧩 Configurazione Supabase
 
-📄 Licenza
-MIT License.
+Importa lo schema contenuto in /supabase/schema.sql (opzionale).
+
+Assicurati che:
+
+✔ la tabella profiles sia sincronizzata con gli utenti
+✔ le RLS delle tabelle posts e broadcasts siano attive
+✔ i bucket Storage: posts/ e broadcasts/ esistano
+✔ siano presenti le RPC:
+
+update_post_get_full
+
+update_broadcast_get_full
+
+## 🤝 Contribuire
+
+Le PR sono benvenute!
+Guarda la sezione Issues per idee e miglioramenti.
+
+# 📄 Licenza
+
+Rilasciato sotto licenza MIT.
+Puoi usarlo liberamente per scuole, istituti o progetti personali.
