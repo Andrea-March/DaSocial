@@ -55,8 +55,12 @@ export function UserProvider({ children }) {
     return profile.role === "admin" || profile.is_representative === true;
   }
 
+  function canEditBroadcast(){
+    return canPublishBroadcast();
+  }
+
   return (
-    <UserContext.Provider value={{ user, profile, setProfile, loading, canPublishBroadcast }}>
+    <UserContext.Provider value={{ user, profile, setProfile, loading, canPublishBroadcast, canEditBroadcast }}>
       {children}
     </UserContext.Provider>
   );
