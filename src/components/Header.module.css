@@ -26,6 +26,11 @@
   -webkit-text-fill-color: transparent;
 }
 
+.logo {
+  height: 32px;   /* 24–32px ideale */
+  width: auto;
+}
+
 .avatarButton {
   width: 36px;
   height: 36px;

@@ -16,8 +16,14 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>DaSocial</h1>
+      <img
+        src="/icons/android-chrome-192x192.png"
+        alt="DaSocial"
+        className={styles.logo} />
 
+      <h1 className={styles.title}>
+      DaSocial</h1>
+      
       <button className={styles.avatarButton} onClick={onProfileClick}>
         {avatarUrl ? (
           <img src={avatarUrl} className={styles.avatarImg} alt="avatar" />
