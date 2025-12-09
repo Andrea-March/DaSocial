@@ -93,6 +93,7 @@ export default function BroadcastCard({ broadcast, variant = "minimal" }) {
 
               {menuOpen && canEditBroadcast && (
                 <ActionMenu
+                  backdrop={false}
                   open={menuOpen}
                   onClose={() => setMenuOpen(false)}
                   actions={[

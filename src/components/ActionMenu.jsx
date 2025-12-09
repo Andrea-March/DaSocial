@@ -5,7 +5,7 @@ export default function ActionMenu({
   open,
   onClose,
   actions = [],
-  anchorRef // opzionale se vuoi ancorare il menu ad un elemento
+  backdrop = true,
 }) {
 
   const menuRef = useRef();
@@ -31,7 +31,7 @@ export default function ActionMenu({
   return (
     <>
       {/* BACKDROP */}
-      <div className={styles.backdrop} onClick={onClose} />
+      <div className={backdrop ? styles.backdrop : ""} onClick={onClose} />
 
       {/* MENU */}
       <div ref={menuRef} className={`${styles.menu} ${styles.menuOpen}`}>
