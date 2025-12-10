@@ -9,6 +9,9 @@
   left: 0;
   right: 0;
   background: var(--bg-main);
+  max-width: 650px;
+  justify-self: center;
+  width: 100%;
 }
 
 .icon {
