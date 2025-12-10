@@ -1,37 +1,37 @@
+import { useState } from "react";
+import TopTabs from "../components/TopTabs";
+import MarketBooksFeed from "../components/MarketBooksFeed";
+import MarketItemsFeed from "../components/MarketItemsFeed";
+import MarketFab from "../components/MarketFab";
+import NewMarketItem from "../components/NewMarketItem";
 import styles from "./Market.module.css";
-import MarketItem from "../components/MarketItem";
 
-const mockItems = [
-  {
-    id: 1,
-    title: "Libro di Matematica - Edizione Blu",
-    price: "€12",
-    image: "/mock/book.jpg",
-    description: "Buone condizioni, qualche evidenziatura.",
-  },
-  {
-    id: 2,
-    title: "Fisica Vol.2 Zanichelli",
-    price: "€9",
-    image: "/mock/physics.jpg",
-    description: "Condizioni ottime.",
-  }
-];
+export default function MarketPage() {
+  const [activeTab, setActiveTab] = useState("books");
+  const [showNewItem, setShowNewItem] = useState(false);
 
-export default function Market() {
+  const tabs = [
+    { label: "Libri", value: "books" },
+    { label: "Oggetti", value: "items" }
+  ];
+
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Mercatino</h1>
+      <TopTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
-      {mockItems.map(item => (
-        <MarketItem
-          key={item.id}
-          title={item.title}
-          price={item.price}
-          image={item.image}
-          description={item.description}
+      {activeTab === "books" && <MarketBooksFeed />}
+      {activeTab === "items" && <MarketItemsFeed />}
+
+      {/* FAB */}
+      <MarketFab onClick={() => setShowNewItem(true)} />
+
+      {/* MODALE */}
+      {showNewItem && (
+        <NewMarketItem
+          onClose={() => setShowNewItem(false)}
+          onCreated={() => {}}
         />
-      ))}
+      )}
     </div>
   );
 }

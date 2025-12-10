@@ -1,0 +1,117 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0;
+  z-index: 999;
+}
+
+.container {
+  background: var(--bg-main);
+  width: 100%;
+  max-height: 90vh;
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.12);
+  animation: slideUp 0.22s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: auto;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.cancel {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.publish {
+  background: var(--accent);
+  color: var(--color-white);
+  border: none;
+  padding: 6px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.imageSection {
+  margin-top: 10px;
+}
+
+.uploadBtn {
+  border: 1px dashed var(--border-color);
+  padding: 14px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: var(--bg-subtle);
+}
+
+.previewWrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.imagePreview {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.changeImage,
+.removeImage {
+  position: absolute;
+  bottom: 10px;
+  background: rgba(0,0,0,0.6);
+  color: var(--color-white);
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
