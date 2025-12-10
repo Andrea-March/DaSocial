@@ -51,6 +51,7 @@
   font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
+  padding: 0 4px;
 }
 
 .time {
@@ -59,6 +60,8 @@
   background: var(--surface-2);
   border-radius: 12px;
   color: var(--text-secondary);
+  margin-left: auto;
+  min-width: 75px;
 }
 
 /* -------------------------

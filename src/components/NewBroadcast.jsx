@@ -43,6 +43,13 @@ export default function NewBroadcast({ onClose, onCreated, broadcastToEdit }) {
     const file = e.target.files[0];
     if (file) setImagePreview(URL.createObjectURL(file));
   };
+  
+  const handleRemoveImage = () => {
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
 
   const handlePublish = async () => {
     if (!title.trim()) {
@@ -308,7 +315,7 @@ export default function NewBroadcast({ onClose, onCreated, broadcastToEdit }) {
 
               <span
                 className={styles.removeImage}
-                onClick={() => setImagePreview(null)}
+                onClick={() => handleRemoveImage()}
               >
                 Rimuovi
               </span>
