@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUser } from "../context/UserContext";
-import { Plus } from "lucide-react";
 import styles from "./Broadcast.module.css";
 import NewBroadcast from "../components/NewBroadcast";
 import TopTabs from "../components/TopTabs";
@@ -8,6 +7,8 @@ import AnnouncementsList from "../components/AnnouncementsList";
 import EventsList from "../components/EventsList";
 import { useBroadcast } from "../context/broadcastContext";
 import Header from "../components/Header";
+import Fab from "../components/Fab";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function Broadcast() {
   const [lastCreatedBroadcast, setLastCreatedBroadcast] = useState(null);
@@ -15,7 +16,15 @@ export default function Broadcast() {
   const {profile, canPublishBroadcast} = useUser();
   const [tab, setTab] = useState("announcements");
 
-  const {broadcastBeingEdited, showEditBroadcast, closeEditBroadcast, setLastUpdatedBroadcast} = useBroadcast();
+  const {
+    broadcastBeingEdited, 
+    showEditBroadcast, 
+    closeEditBroadcast, 
+    setLastUpdatedBroadcast, 
+    broadcastBeingDeleted,
+    deleteBroadcast,
+    closeDeleteBroadcast
+    } = useBroadcast();
 
   return (
     <> 
@@ -40,12 +49,7 @@ export default function Broadcast() {
         <>
         
         {profile && canPublishBroadcast() && (
-          <button
-            className={styles.newBroadcastBtn}
-            onClick={() => setShowModal(true)}
-          >
-            <Plus />
-          </button>
+          <Fab onClick={() => setShowModal(true)} />
         )}
         </>
         {showModal && (
@@ -69,6 +73,15 @@ export default function Broadcast() {
             broadcastToEdit={broadcastBeingEdited}
           />
         )}
+        <ConfirmModal
+          open={!!broadcastBeingDeleted}
+          title="Eliminare l'annuncio?"
+          subtitle="Questa azione non può essere annullata."
+          confirmText="Elimina"
+          danger
+          onConfirm={deleteBroadcast}
+          onCancel={closeDeleteBroadcast}
+        />
       </div>
     </>
   );

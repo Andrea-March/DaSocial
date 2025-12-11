@@ -1,11 +1,32 @@
 import { createContext, useContext, useState } from "react";
-
+import { supabase } from "../lib/supabaseClient";
 const BroadcastContext = createContext();
 
 export function BroadcastProvider({ children }) {
   // --- EDIT ---
   const [broadcastBeingEdited, setBroadcastBeingEdited] = useState(null);
   const [showEditBroadcast, setShowEditBroadcast] = useState(false);
+
+  function extractPath(url) {
+    const match = url.match(/public\/([^/]+)\/(.+)$/);
+    return match ? match[2] : null;
+  }
+
+  async function deleteBroadcast() {
+    const broadcast = broadcastBeingDeleted;
+
+    // delete image
+    if (broadcast.image_url) {
+      const path = extractPath(broadcast.image_url);
+      await supabase.storage.from("broadcasts").remove([path]);
+    }
+
+    // delete row
+    await supabase.from("broadcasts").delete().eq("id", broadcast.id);
+
+    // notify feed
+    triggerBroadcastDeleted(broadcast.id);
+  }
 
   const openEditBroadcast = (broadcast) => {
     setBroadcastBeingEdited(broadcast);
@@ -28,21 +49,17 @@ export function BroadcastProvider({ children }) {
 
   // --- DELETE ---
   const [broadcastBeingDeleted, setBroadcastBeingDeleted] = useState(null);
-  const [showDeleteBroadcastModal, setShowDeleteBroadcastModal] = useState(false);
 
   const openDeleteBroadcast = (broadcast) => {
     setBroadcastBeingDeleted(broadcast);
-    setShowDeleteBroadcastModal(true);
   };
 
   const closeDeleteBroadcast = () => {
     setBroadcastBeingDeleted(null);
-    setShowDeleteBroadcastModal(false);
   };
 
   const triggerBroadcastDeleted = (broadcastId) => {
     setBroadcastBeingDeleted(null);
-    setShowDeleteBroadcastModal(false);
     setBroadcastsToDelete(broadcastId); // feed listener
   };
 
@@ -62,7 +79,7 @@ export function BroadcastProvider({ children }) {
 
         // delete
         broadcastBeingDeleted,
-        showDeleteBroadcastModal,
+        deleteBroadcast,
         openDeleteBroadcast,
         closeDeleteBroadcast,
         triggerBroadcastDeleted,

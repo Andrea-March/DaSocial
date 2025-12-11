@@ -2,16 +2,19 @@ import { useState } from "react";
 import TopTabs from "../components/TopTabs";
 import MarketBooksFeed from "../components/MarketBooksFeed";
 import MarketItemsFeed from "../components/MarketItemsFeed";
-import MarketFab from "../components/MarketFab";
+import Fab from "../components/Fab";
 import NewMarketItem from "../components/NewMarketItem";
 import NewMarketBook from "../components/NewMarketBook";
 import MarketChoiceSheet from "../components/MarketChoiceSheet";
 import styles from "./Market.module.css";
 import Header from "../components/Header";
+import ConfirmModal from "../components/ConfirmModal";
+import { useMarketContext } from "../context/MarketContext";
 
 export default function MarketPage() {
   const [activeTab, setActiveTab] = useState("books");
 
+  const {bookBeingDeleted, deleteBook, closeDeleteBook} = useMarketContext();
   // NEW STATES
   const [showChoiceSheet, setShowChoiceSheet] = useState(false);
   const [modalType, setModalType] = useState(null);
@@ -45,7 +48,7 @@ export default function MarketPage() {
         {activeTab === "items" && <MarketItemsFeed />}
 
         {/* FAB */}
-        <MarketFab onOpenSheet={openFabSheet} />
+        <Fab onClick={openFabSheet} />
 
         {/* BOTTOM SHEET SCELTA */}
         {showChoiceSheet && (
@@ -66,9 +69,17 @@ export default function MarketPage() {
         {modalType === "book" && (
           <NewMarketBook
             onClose={closeModal}
-            onCreated={() => {}}
           />
         )}
+        <ConfirmModal
+          open={!!bookBeingDeleted}
+          title="Eliminare il libro?"
+          subtitle="Questa azione non può essere annullata."
+          confirmText="Elimina"
+          danger
+          onConfirm={deleteBook}
+          onCancel={closeDeleteBook}
+        />
       </div>
     </>
   );

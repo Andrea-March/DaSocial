@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-
+import { supabase } from "../lib/supabaseClient";
 const PostContext = createContext();
 
 export function PostProvider({ children }) {
@@ -11,8 +11,34 @@ export function PostProvider({ children }) {
   const [lastUpdatedPost, setLastUpdatedPost] = useState(null);
 
   const [postBeingDeleted, setPostBeingDeleted] = useState(null);
-  const [showDeletePostModal, setShowDeletePostModal] = useState(false);
   const [postsToDelete, setPostsToDelete] = useState(null);
+
+  function extractPath(url) {
+    // Prende tutto dopo "public/{bucket}/"
+    const match = url.match(/public\/([^/]+)\/(.+)$/);
+
+    if (!match) return null;
+
+    // match[1] = bucket ("posts")
+    // match[2] = internal path ("posts/filename.webp")
+    return match[2];
+  }
+
+  async function deletePost() {
+    const post = postBeingDeleted;
+
+    // delete image
+    if (post.image_url) {
+      const path = extractPath(post.image_url);
+      await supabase.storage.from("posts").remove([path]);
+    }
+
+    // delete post row
+    await supabase.from("posts").delete().eq("id", post.id);
+
+    // notify feed
+    triggerPostDeleted(post.id);
+  }
 
   // --- CREATE ---
   const openNewPost = () => {
@@ -46,18 +72,15 @@ export function PostProvider({ children }) {
   // open delete modal
   const openDeletePost = (post) => {
     setPostBeingDeleted(post);
-    setShowDeletePostModal(true);
   };
 
   // close delete modal
   const closeDeletePost = () => {
     setPostBeingDeleted(null);
-    setShowDeletePostModal(false);
   };
 
   // notify feed
   const triggerPostDeleted = (postId) => {
-    setShowDeletePostModal(false);
     setPostBeingDeleted(null);
     setPostsToDelete(postId); // feed listener
   };
@@ -79,12 +102,11 @@ export function PostProvider({ children }) {
       lastUpdatedPost,
       triggerPostUpdated,
 
-      //delte
-      showDeletePostModal,
+      //delete
       postBeingDeleted,
+      deletePost,
       openDeletePost,
       closeDeletePost,
-      triggerPostDeleted,
       postsToDelete,
     }}>
       {children}

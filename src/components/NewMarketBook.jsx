@@ -3,12 +3,14 @@ import styles from "./NewMarketItem.module.css"; // riusiamo gli stessi stili
 import { X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useUser } from "../context/UserContext";
-import imageCompression from "browser-image-compression";
 import { compressImage } from "../lib/compressImage";
+import { useMarketContext } from "../context/MarketContext";
 
-export default function NewMarketBook({ onClose, onCreated }) {
+export default function NewMarketBook({ onClose }) {
   const { user } = useUser();
   const fileInputRef = useRef(null);
+
+  const { triggerBookCreated } = useMarketContext();
 
   // --- FORM STATE ---
   const [title, setTitle] = useState("");
@@ -97,7 +99,7 @@ export default function NewMarketBook({ onClose, onCreated }) {
       .single();
 
     if (!error) {
-      onCreated?.(data);
+      triggerBookCreated(data);
       onClose();
     }
   }

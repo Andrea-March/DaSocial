@@ -4,13 +4,12 @@ import BroadcastCard from "./BroadcastCard";
 import styles from "./AnnouncementsList.module.css";
 import AnnouncementSkeleton from "./AnnouncementSkeleton";
 import { useBroadcast } from "../context/broadcastContext";
-import DeleteBroadcastModal from "./DeleteBroadcastModal";
 
 export default function AnnouncementsList({ refreshTrigger }) {
   const [broadcasts, setBroadcasts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const {lastUpdatedBroadcast, showDeleteBroadcastModal, broadcastsToDelete} = useBroadcast();
+  const {lastUpdatedBroadcast, broadcastsToDelete} = useBroadcast();
 
   /* IMPORTANTE RIORDINARE I BROADCAST SE IN UNO VIENE MODIFICATO IL CAMPO PINNED */
   function sortBroadcasts(list) {
@@ -84,7 +83,6 @@ export default function AnnouncementsList({ refreshTrigger }) {
           <BroadcastCard key={item.id} broadcast={item} variant="icon"/>
         ))}
       </div>
-      {showDeleteBroadcastModal && <DeleteBroadcastModal />}
     </div>
   );
 }

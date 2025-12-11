@@ -165,10 +165,21 @@ async function submitComment() {
 
       {/* POST MENU */}
       {menuOpen && user?.id !== post.user_id && (
-        <div className={styles.menu}>
-          <div className={styles.menuItem}>Segnala</div>
-          <div className={styles.menuItem}>Nascondi</div>
-        </div>
+        <ActionMenu
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          actions={[
+            {
+              label: "Segnala",
+              onClick: () => openEditPost(post)
+            },
+            {
+              label: "Nascondi",
+              danger: true,
+              onClick: () => openDeletePost(post)
+            }
+          ]}
+        />
       )}
       {menuOpen && user?.id === post.user_id && (
         <ActionMenu

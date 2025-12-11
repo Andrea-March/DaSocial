@@ -11,6 +11,7 @@ import { UserProvider } from "./context/UserContext";
 import { ToastProvider } from "./context/ToastContext";
 import { PostProvider } from "./context/PostContext";
 import { BroadcastProvider } from "./context/broadcastContext";
+import { MarketProvider } from "./context/MarketContext";
 
 registerSW({
   onNeedRefresh() {},
@@ -23,7 +24,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ToastProvider >
         <PostProvider >
           <BroadcastProvider >
-            <App />
+            <MarketProvider>
+              <App />
+            </MarketProvider>
           </BroadcastProvider>
         </PostProvider>
       </ToastProvider>

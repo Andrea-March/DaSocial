@@ -10,8 +10,6 @@ export default function BottomNav() {
   const location = useLocation();
   const [showNewPost, setShowNewPost] = useState(false);
 
-  const { openNewPost } = usePostContext();
-
   return (
     <nav className={styles.nav}>
         <div className={styles.item}
@@ -24,9 +22,6 @@ export default function BottomNav() {
           <Megaphone size={24} className={location.pathname === "/broadcast" ? styles.active : ""} />
         </div>
 
-        {/* <div className={styles.add} onClick={openNewPost}>
-          <PlusCircle size={28} />
-        </div> */}
         <img
           src="/icons/android-chrome-192x192.png"
           alt="DaSocial"

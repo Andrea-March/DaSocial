@@ -7,12 +7,13 @@ import { supabase } from "../lib/supabaseClient";
 import PostSkeleton from "../components/PostSkeleton";
 import { usePostContext } from "../context/PostContext";
 import NewPost from "../components/NewPost";
-import DeletePostModal from "../components/DeletePostModal";
+import ConfirmModal from '../components/ConfirmModal'
+import Fab from "../components/Fab";
 
 
 export default function Home() {
 
-  const { lastCreatedPost } = usePostContext();
+  const { lastCreatedPost, postBeingDeleted, deletePost, closeDeletePost } = usePostContext();
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,7 @@ export default function Home() {
 
   const POSTS_LIMIT = 3;
   
-  const { showNewPost, closeNewPost, postBeingEdited, showDeletePostModal, postsToDelete, lastUpdatedPost  } = usePostContext();
+  const { openNewPost, showNewPost, closeNewPost, postBeingEdited, postsToDelete, lastUpdatedPost  } = usePostContext();
 
   useEffect(() => {
     if (postsToDelete) {
@@ -140,7 +141,16 @@ export default function Home() {
             onClose={closeNewPost}
           />
         )}
-        {showDeletePostModal && <DeletePostModal />}
+        <Fab onClick={openNewPost} />
+        <ConfirmModal
+          open={!!postBeingDeleted}
+          title="Eliminare il post?"
+          subtitle="Questa azione non può essere annullata."
+          confirmText="Elimina"
+          danger
+          onConfirm={deletePost}
+          onCancel={closeDeletePost}
+        />
     </div>
   );
 }

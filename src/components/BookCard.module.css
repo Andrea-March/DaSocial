@@ -7,7 +7,19 @@
   overflow: hidden;
   padding: 12px;
   margin-bottom: 16px;
+  position:relative;
 }
+
+.menuBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  z-index: 2;
+}
+
 
 /* Contenitore per controllare il rapporto 2:3 */
 .imageWrapper {
@@ -71,4 +83,25 @@
   height: 22px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Badge venduto */
+.badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--danger);
+  color: white;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  z-index: 2;
+}
+
+/* Oscura leggermente la card */
+.sold {
+  opacity: 0.6;
+  position: relative;
+  pointer-events: none; 
 }
