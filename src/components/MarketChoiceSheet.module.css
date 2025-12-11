@@ -1,0 +1,69 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 999;
+}
+
+.sheet {
+  width: 100%;
+  background: var(--bg-main);
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  animation: slideUp 0.25s ease-out;
+}
+
+.title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 16px;
+}
+
+.iconBubble {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primaryBubble {
+  background-color: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.secondaryBubble {
+  background-color: color-mix(in srgb, var(--accent-secondary) 18%, transparent);
+}
+
+.cancel {
+  width: 100%;
+  padding: 14px 0;
+  text-align: center;
+  margin-top: 10px;
+  border-radius: 12px;
+  font-weight: 500;
+  background: var(--bg-subtle);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+

@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { usePostContext } from "../context/PostContext";
 import imageCompression from "browser-image-compression";
 import { useToast } from "../context/ToastContext";
+import { compressImage } from "../lib/compressImage";
 
 export default function NewPost({ onClose, postToEdit }) {
   const [text, setText] = useState("");
@@ -75,12 +76,7 @@ export default function NewPost({ onClose, postToEdit }) {
 
       const file = fileInputRef.current.files[0];
 
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 1280,
-        fileType: "image/webp",
-        useWebWorker: true
-      });
+      const compressed = await compressImage(file);
 
       const newName = `${user.id}_${Date.now()}.webp`;
       const filePath = `posts/${newName}`;
@@ -138,12 +134,7 @@ export default function NewPost({ onClose, postToEdit }) {
 
       if (file) {
         // 🔥 1) Compress + resize
-        const compressed = await imageCompression(file, {
-          maxSizeMB: 0.5,  
-          maxWidthOrHeight: 1280,
-          fileType: "image/webp",
-          useWebWorker: true
-        });
+        const compressed = await compressImage(file);
 
         // 🔥 2) Convert blob in File (per Supabase)
         const ext = "webp";

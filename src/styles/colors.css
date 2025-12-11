@@ -13,7 +13,7 @@
 
   /* Accent (Blu Da Vinci) */
   --color-accent: #0055ff;
-  --accent-secondary: #2F6BFF; 
+  --accent-secondary: #FF8A00; 
 
   /* Uso semantico */
   --text-primary: var(--color-black);

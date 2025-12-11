@@ -4,6 +4,7 @@ import styles from "./ProfileComponent.module.css";
 import { useUser } from "../context/UserContext";
 import { supabase } from "../lib/supabaseClient";
 import { useToast } from "../context/ToastContext";
+import { compressImage } from "../lib/compressImage";
 
 export default function ProfileComponent() {
   const { user, profile, setProfile } = useUser();
@@ -36,10 +37,7 @@ export default function ProfileComponent() {
   }
 
   // --- COMPRESSIONE ---
-  const compressed = await imageCompression(file, {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1024,
-  });
+  const compressed = await compressImage(file);
 
   // --- CROP 1:1 ---
   const cropped = await cropToSquare(compressed);

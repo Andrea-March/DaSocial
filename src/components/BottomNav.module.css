@@ -27,3 +27,8 @@
   cursor: pointer;
   color: var(--accent);
 }
+
+.logo {
+  height: 40px;   /* 24–32px ideale */
+  width: auto;
+}

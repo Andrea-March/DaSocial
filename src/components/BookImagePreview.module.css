@@ -1,0 +1,69 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--bg-main);
+  border: none;
+  border-radius: 50%;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* --- ANIMAZIONI --- */
+@keyframes fadeZoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeZoomOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+/* wrapper animato */
+.animateIn {
+  animation: fadeZoomIn 180ms ease-out forwards;
+}
+
+.animateOut {
+  animation: fadeZoomOut 150ms ease-in forwards;
+}

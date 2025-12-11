@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useToast } from "../context/ToastContext";
 import imageCompression from "browser-image-compression";
 import { useBroadcast } from "../context/broadcastContext";
+import { compressImage } from "../lib/compressImage";
 
 export default function NewBroadcast({ onClose, onCreated, broadcastToEdit }) {
   const [title, setTitle] = useState("");
@@ -79,12 +80,7 @@ export default function NewBroadcast({ onClose, onCreated, broadcastToEdit }) {
       }
 
       if (file) {
-        const compressed = await imageCompression(file, {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1600,
-          fileType: "image/webp",
-          useWebWorker: true
-        });
+        const compressed = await compressImage(file);
 
         const ext = "webp";
         const fileName = `${user.id}_${Date.now()}.${ext}`;
@@ -176,12 +172,7 @@ export default function NewBroadcast({ onClose, onCreated, broadcastToEdit }) {
 
       const file = fileInputRef.current.files[0];
 
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 1280,
-        fileType: "image/webp",
-        useWebWorker: true
-      });
+      const compressed = await compressImage(file);
 
       const newName = `${user.id}_${Date.now()}.webp`;
       const filePath = `broadcasts/${newName}`;

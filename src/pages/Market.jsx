@@ -4,21 +4,40 @@ import MarketBooksFeed from "../components/MarketBooksFeed";
 import MarketItemsFeed from "../components/MarketItemsFeed";
 import MarketFab from "../components/MarketFab";
 import NewMarketItem from "../components/NewMarketItem";
+import NewMarketBook from "../components/NewMarketBook";
+import MarketChoiceSheet from "../components/MarketChoiceSheet";
 import styles from "./Market.module.css";
 import Header from "../components/Header";
 
 export default function MarketPage() {
   const [activeTab, setActiveTab] = useState("books");
-  const [showNewItem, setShowNewItem] = useState(false);
+
+  // NEW STATES
+  const [showChoiceSheet, setShowChoiceSheet] = useState(false);
+  const [modalType, setModalType] = useState(null);
 
   const tabs = [
     { label: "Libri", value: "books" },
     { label: "Oggetti", value: "items" }
   ];
 
+  function openFabSheet() {
+    setShowChoiceSheet(true);
+  }
+
+  function handleChoice(type) {
+    setShowChoiceSheet(false);
+    setModalType(type); // "book" oppure "item"
+  }
+
+  function closeModal() {
+    setModalType(null);
+  }
+
   return (
     <>
       <Header />
+
       <div className={styles.container}>
         <TopTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
@@ -26,12 +45,27 @@ export default function MarketPage() {
         {activeTab === "items" && <MarketItemsFeed />}
 
         {/* FAB */}
-        <MarketFab onClick={() => setShowNewItem(true)} />
+        <MarketFab onOpenSheet={openFabSheet} />
 
-        {/* MODALE */}
-        {showNewItem && (
+        {/* BOTTOM SHEET SCELTA */}
+        {showChoiceSheet && (
+          <MarketChoiceSheet
+            onClose={() => setShowChoiceSheet(false)}
+            onSelect={handleChoice}
+          />
+        )}
+
+        {/* MODALI */}
+        {modalType === "item" && (
           <NewMarketItem
-            onClose={() => setShowNewItem(false)}
+            onClose={closeModal}
+            onCreated={() => {}}
+          />
+        )}
+
+        {modalType === "book" && (
+          <NewMarketBook
+            onClose={closeModal}
             onCreated={() => {}}
           />
         )}

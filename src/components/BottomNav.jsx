@@ -24,10 +24,14 @@ export default function BottomNav() {
           <Megaphone size={24} className={location.pathname === "/broadcast" ? styles.active : ""} />
         </div>
 
-        <div className={styles.add} onClick={openNewPost}>
+        {/* <div className={styles.add} onClick={openNewPost}>
           <PlusCircle size={28} />
-        </div>
-
+        </div> */}
+        <img
+          src="/icons/android-chrome-192x192.png"
+          alt="DaSocial"
+          className={styles.logo} 
+        />
         <div className={styles.item}
             onClick={() => navigate("/market")}>
           <ShoppingBag size={24} className={location.pathname === "/market" ? styles.active : ""} />
