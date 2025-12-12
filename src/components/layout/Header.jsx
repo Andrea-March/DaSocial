@@ -2,10 +2,10 @@ import styles from "./Header.module.css";
 import { User as UserIcon } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import Avatar from "../ui/Avatar";
 
 export default function Header() {
-  const { user, profile } = useUser();
-  const avatarUrl = profile?.avatar_url;
+  const { user, profile, avatarSrc } = useUser();
   const username = user?.user_metadata?.username;
 
   const navigate = useNavigate();
@@ -25,15 +25,12 @@ export default function Header() {
       DaSocial</h1>
       
       <button className={styles.avatarButton} onClick={onProfileClick}>
-        {avatarUrl ? (
-          <img src={avatarUrl} className={styles.avatarImg} alt="avatar" />
-        ) : username ? (
-          <div className={styles.avatarFallback}>
-            {username[0].toUpperCase()}
-          </div>
-        ) : (
-          <UserIcon size={20} />
-        )}
+         <Avatar
+            userId={user.id}
+            username={profile.username}
+            size="sm"
+            clickable
+          />
       </button>
     </header>
   );

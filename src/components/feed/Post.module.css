@@ -186,13 +186,6 @@
   margin-bottom: 2px;
 }
 
-/* Smaller avatars */
-.avatarSmall {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--border-color);
-}
 
 .commentAuthor {
   font-weight: 600;

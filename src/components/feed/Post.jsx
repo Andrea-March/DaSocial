@@ -7,11 +7,12 @@ import { supabase } from "../../lib/supabaseClient";
 import { usePostContext } from "../../context/PostContext";
 import { groupComments } from "../../lib/groupComments";
 import ActionMenu from "../ui/ActionMenu";
+import Avatar from "../ui/Avatar";
 
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  const { user, profile } = useUser();
+  const { user, profile, avatarSrc } = useUser();
   const [hasLiked, setHasLiked] = useState(post.post_likes?.length > 0);
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -23,6 +24,11 @@ export default function Post({ post }) {
   const [comments, setComments] = useState([]);
 
   const { openEditPost, openDeletePost } = usePostContext();
+
+  const isMine = post.user_id === user?.id;
+  const postAvatar = isMine
+    ? avatarSrc
+    : post.profile?.avatar_url;
 
   async function toggleLike(postId, hasLiked) {
     const userId = user?.id;
@@ -145,13 +151,12 @@ async function submitComment() {
       {/* HEADER */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          {post.profiles?.avatar_url ? (
-              <img src={post.profiles.avatar_url} className={styles.avatar} alt="" />
-            ) : (
-              <div className={styles.avatarFallback}>
-                {post.username?.[0]?.toUpperCase() || "?"}
-              </div>
-          )}
+           <Avatar
+              userId={post.user_id}
+              avatarUrl={post.profile?.avatar_url}
+              username={post.profile?.username}
+              size="sm"          // sm | md | lg
+            />
           <div className={styles.info}>
             <div className={styles.author}>{post.profiles.username}</div>
             <div className={styles.time}>{timeAgo(post.created_at)}</div>
@@ -241,7 +246,12 @@ async function submitComment() {
               
               {/* Comment main block */}
               <div className={styles.commentHeader}>
-                <img src={c.profiles.avatar_url} className={styles.avatarSmall} />
+                 <Avatar
+                    userId={c.user_id}
+                    avatarUrl={c.profile?.avatar_url}
+                    username={c.profile?.username}
+                    size="sm"
+                  />
                 <div>
                   <div className={styles.commentAuthor}>{c.profiles.username}</div>
                   <div className={styles.commentText}>{c.content}</div>
@@ -262,7 +272,12 @@ async function submitComment() {
                 <div className={styles.replies}>
                   {c.replies.map((r) => (
                     <div key={r.id} className={styles.reply}>
-                      <img src={r.profiles.avatar_url} className={styles.avatarSmall} />
+                      <Avatar
+                        userId={r.user_id}
+                        avatarUrl={r.profile?.avatar_url}
+                        username={r.profile?.username}
+                        size="sm"
+                      />
                       <div>
                         <div className={styles.commentAuthor}>{r.profiles.username}</div>
                         <div className={styles.commentText}>{r.content}</div>
@@ -288,7 +303,12 @@ async function submitComment() {
               )}
 
               <div className={styles.addComment}>
-                <img src={profile.avatar_url} className={styles.avatarSmall} />
+                <Avatar
+                  userId={post.user_id}
+                  avatarUrl={post.profile?.avatar_url}
+                  username={post.profile?.username}
+                  size="sm"
+                />
 
                 <div className={styles.inputWrapper}>
                   <input

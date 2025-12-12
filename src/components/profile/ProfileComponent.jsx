@@ -5,9 +5,11 @@ import { useUser } from "../../context/UserContext";
 import { supabase } from "../../lib/supabaseClient";
 import { useToast } from "../../context/ToastContext";
 import { compressImage } from "../../lib/compressImage";
+import { cropToSquare } from "../../lib/cropToSquare";
+import Avatar from "../ui/Avatar";
 
 export default function ProfileComponent() {
-  const { user, profile, setProfile } = useUser();
+  const { user, profile, setProfile, avatarSrc } = useUser();
   const { showToast } = useToast();
 
   // Campi locali derivati da profiles
@@ -17,7 +19,6 @@ export default function ProfileComponent() {
 
   const fileInputRef = useRef(null);
 
-  const avatarUrl = profile?.avatar_url;
   const username = profile?.username;
 
   // --- UPLOAD AVATAR ---
@@ -26,91 +27,72 @@ export default function ProfileComponent() {
   };
 
   async function handleFileChange(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+    const originalFile = e.target.files?.[0];
+    if (!originalFile) return;
 
-  // --- LIMITE MAX 10 MB ---
-  const MAX_SIZE_MB = 10;
-  if (file.size / 1024 / 1024 > MAX_SIZE_MB) {
-    showToast("L'immagine è troppo grande (max 10MB)", "error");
-    return;
-  }
-
-  // --- COMPRESSIONE ---
-  const compressed = await compressImage(file);
-
-  // --- CROP 1:1 ---
-  const cropped = await cropToSquare(compressed);
-
-  // --- Genera nuovo filePath ---
-  const fileExt = "webp"; // meglio forzare sempre webp dopo compressione
-  const fileName = `${user.id}.${fileExt}`;
-  const filePath = `avatars/${fileName}`;
-
-  // --- 1) Recupera il vecchio avatar ---
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("avatar_url")
-    .eq("id", user.id)
-    .single();
-
-  const oldUrl = profileData?.avatar_url;
-  let oldPath = null;
-
-  if (oldUrl) {
-    // Estrai solo "<folder>/<filename>"
-    const parts = oldUrl.split("/storage/v1/object/public/avatars/");
-    if (parts[1]) oldPath = "avatars/" + parts[1];
-  }
-
-  // --- 2) Upload nuovo avatar ---
-  const { error: uploadError } = await supabase.storage
-    .from("avatars")
-    .upload(filePath, cropped, {
-      upsert: true,
-      contentType: "image/webp",
+    // CLONE del file (fondamentale)
+    const file = new File([originalFile], originalFile.name, {
+      type: originalFile.type,
     });
 
-  if (uploadError) {
-    console.error(uploadError);
-    showToast("Errore durante il caricamento", "error");
-    return;
-  }
+    const MAX_SIZE_MB = 10;
+    if (file.size / 1024 / 1024 > MAX_SIZE_MB) {
+      showToast("L'immagine è troppo grande (max 10MB)", "error");
+      return;
+    }
 
-  // --- 3) Se esiste il vecchio avatar → cancellalo ---
-  if (oldPath && oldPath !== filePath) {
-    const { error: deleteError } = await supabase.storage
-      .from("avatars")
-      .remove([oldPath]);
+    try {
+      // 1) compressione + crop (utils condivise)
+      const compressed = await compressImage(file);   
+      const cropped = await cropToSquare(compressed); 
 
-    if (deleteError) {
-      console.warn("Impossibile eliminare il vecchio avatar:", deleteError);
-      // Non blocchiamo l'utente per un errore di pulizia
+      /* const filePath = `avatars/${user.id}.webp`; */
+      const filePath = `avatars/${user.id}.webp`;
+      // 2) upload (sovrascrive automaticamente)
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, cropped, {
+          upsert: true,
+          contentType: "image/webp",
+        });
+
+      if (uploadError) throw uploadError;
+
+      // 3) url pubblico
+      const { data } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+      const now = new Date().toISOString();
+
+      // 4) update profilo
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          avatar_url: publicUrl,
+          avatar_updated_at: now,
+        })
+        .eq("id", user.id);
+
+      if (profileError) throw profileError;
+
+      // 5) stato locale
+      setProfile((prev) => ({
+        ...prev,
+        avatar_url: publicUrl,
+        avatar_updated_at: now,
+      }));
+      showToast("Foto aggiornata!", "success");
+
+    } catch (err) {
+      console.error(err);
+      showToast("Errore durante l’aggiornamento dell’avatar", "error");
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   }
-
-  // --- 4) Ottieni nuovo URL pubblico ---
-  const { data: urlData } = supabase.storage
-    .from("avatars")
-    .getPublicUrl(filePath);
-
-  const publicUrl = urlData.publicUrl;
-
-  // --- 5) Aggiorna profilo ---
-  const { error } = await supabase
-    .from("profiles")
-    .update({ avatar_url: publicUrl })
-    .eq("id", user.id);
-
-  if (error) {
-    showToast("Errore durante l’aggiornamento", "error");
-    return;
-  }
-
-  // --- 6) Aggiorna stato ---
-  setProfile((prev) => ({ ...prev, avatar_url: publicUrl }));
-  showToast("Foto aggiornata!", "success");
-}
 
 
   // --- SALVATAGGIO BIO + CLASSE & SEZIONE ---
@@ -146,8 +128,13 @@ export default function ProfileComponent() {
 
       {/* AVATAR */}
       <div className={styles.avatarWrapper} onClick={handleAvatarClick}>
-        {avatarUrl ? (
-          <img src={avatarUrl} className={styles.avatar} alt="Profile" />
+        {avatarSrc ? (
+          <Avatar
+            userId={user.id}
+            username={profile.username}
+            size="lg"
+            clickable
+          />
         ) : (
           <div className={styles.avatarPlaceholder}>
             {username?.[0]?.toUpperCase() || "?"}
@@ -155,8 +142,9 @@ export default function ProfileComponent() {
         )}
       </div>
 
-      <div className={styles.changePhoto}>Cambia foto</div>
+      <div className={styles.changePhoto} onClick={handleAvatarClick}>Cambia foto</div>
       <input
+        accept="image/*"
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
@@ -209,34 +197,3 @@ export default function ProfileComponent() {
   );
 }
 
-async function cropToSquare(imageFile) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = URL.createObjectURL(imageFile);
-
-    img.onload = () => {
-      const size = Math.min(img.width, img.height);
-
-      const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
-
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(
-        img,
-        (img.width - size) / 2,
-        (img.height - size) / 2,
-        size,
-        size,
-        0,
-        0,
-        size,
-        size
-      );
-
-      canvas.toBlob((blob) => {
-        resolve(blob);
-      }, "image/jpeg", 0.9);
-    };
-  });
-}
