@@ -46,8 +46,7 @@ export default function MarketBooksFeed() {
         profiles ( username, avatar_url )
       `)
       .order("created_at", { ascending: false });
-      setTimeout(()=>{setLoading(false)}, 1500)
-    /* setLoading(false); */
+    setLoading(false);
     if (!error) setBooks(data);
   }
 
