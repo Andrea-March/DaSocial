@@ -3,8 +3,11 @@ import { supabase } from "../../lib/supabaseClient";
 import BookCard from "./BookCard";
 import styles from "./MarketFeed.module.css";
 import { useMarketContext } from "../../context/MarketContext";
+import BookSkeleton from "./BookSkeleton";
+import SkeletonContainer from "../ui/SkeletonContainer";
 
 export default function MarketBooksFeed() {
+  const [loading, setLoading] = useState(true);
   const [books, setBooks] = useState([]);
   const { lastDeletedBookId, lastUpdatedBook, lastCreatedBook } = useMarketContext();
 
@@ -35,6 +38,7 @@ export default function MarketBooksFeed() {
   }, [lastCreatedBook]);
 
   async function loadBooks() {
+    setLoading(true);
     const { data, error } = await supabase
       .from("market_books")
       .select(`
@@ -42,11 +46,24 @@ export default function MarketBooksFeed() {
         profiles ( username, avatar_url )
       `)
       .order("created_at", { ascending: false });
-
+      setTimeout(()=>{setLoading(false)}, 1500)
+    /* setLoading(false); */
     if (!error) setBooks(data);
   }
 
-  if (books.length === 0)
+  if (loading) {
+    return (
+      <div className={styles.feed}>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <SkeletonContainer key={i}>
+            <BookSkeleton />
+          </SkeletonContainer>
+        ))}
+      </div>
+    );
+  }
+
+  if (!loading && books.length === 0)
     return <p className={styles.empty}>Nessun libro in vendita</p>;
 
   return (

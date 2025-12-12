@@ -115,3 +115,12 @@
   cursor: pointer;
   font-size: 13px;
 }
+
+
+.changeImage {
+  left: 10px;
+}
+
+.removeImage {
+  right: 10px;
+}

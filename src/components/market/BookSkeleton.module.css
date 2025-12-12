@@ -1,0 +1,68 @@
+/* card IDENTICA alla BookCard */
+.card {
+  display: flex;
+  gap: 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 12px;
+  margin-bottom: 16px;
+  position:relative;
+}
+
+/* immagine libro */
+.imageWrapper {
+  width: 90px;
+  aspect-ratio: 2 / 3;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-gray-light);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  background: var(--color-gray-light);
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--color-gray-light);
+  width: 100%;
+  height: 14px;
+}
+
+.author {
+  font-size: 13px;
+  background: var(--color-gray-light);
+  width: 50%;
+  height: 14px;
+}
+
+.price {
+  background: var(--color-gray-light);
+  margin-top: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 25%;
+}
+
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-gray-light);
+  object-fit: cover;
+}

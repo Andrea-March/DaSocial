@@ -25,7 +25,6 @@ export function UserProvider({ children }) {
 
         setProfile(profData || null);
       }
-
       setLoading(false);
     }
 

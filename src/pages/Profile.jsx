@@ -5,19 +5,12 @@ import { useEffect, useState } from "react";
 import ProfileSkeleton from "../components/profile/ProfileSkeleton";
 import ProfileComponent from "../components/profile/ProfileComponent";
 import Header from "../components/layout/Header";
+import { useUser } from "../context/UserContext";
 
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setTimeout(()=>setLoading(false), 500)
-    }).catch((err)=>{setLoading(false); console.log(err)});
-  }, []);
+  
+  const { loading } = useUser();
 
   return (
     <>
@@ -26,7 +19,7 @@ export default function Profile() {
         {loading ? (
             <ProfileSkeleton />
           ) : (
-            <ProfileComponent user={user}/>
+            <ProfileComponent/>
         )}
 
 
