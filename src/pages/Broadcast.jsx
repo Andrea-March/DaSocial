@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
 import styles from "./Broadcast.module.css";
-import NewBroadcast from "../components/NewBroadcast";
-import TopTabs from "../components/TopTabs";
-import AnnouncementsList from "../components/AnnouncementsList";
-import EventsList from "../components/EventsList";
+import NewBroadcast from "../components/broadcast/NewBroadcast";
+import TopTabs from "../components/layout/TopTabs";
+import AnnouncementsList from "../components/broadcast/AnnouncementsList";
+import EventsList from "../components/broadcast/EventsList";
 import { useBroadcast } from "../context/broadcastContext";
-import Header from "../components/Header";
-import Fab from "../components/Fab";
-import ConfirmModal from "../components/ConfirmModal";
+import Header from "../components/layout/Header";
+import Fab from "../components/layout/Fab";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 export default function Broadcast() {
   const [lastCreatedBroadcast, setLastCreatedBroadcast] = useState(null);

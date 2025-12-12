@@ -2,12 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import styles from "./NewBroadcast.module.css";
 
 import { X, Image as ImageIcon } from "lucide-react";
-import { useUser } from "../context/UserContext";
-import { supabase } from "../lib/supabaseClient";
-import { useToast } from "../context/ToastContext";
+import { useUser } from "../../context/UserContext";
+import { supabase } from "../../lib/supabaseClient";
+import { useToast } from "../../context/ToastContext";
 import imageCompression from "browser-image-compression";
-import { useBroadcast } from "../context/broadcastContext";
-import { compressImage } from "../lib/compressImage";
+import { useBroadcast } from "../../context/broadcastContext";
+import { compressImage } from "../../lib/compressImage";
 
 export default function NewBroadcast({ onClose, onCreated, broadcastToEdit }) {
   const [title, setTitle] = useState("");

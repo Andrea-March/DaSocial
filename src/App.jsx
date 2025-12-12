@@ -1,14 +1,14 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import './App.css'
-import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import Broadcast from './pages/Broadcast'
 import Market from './pages/Market'
-import BottomNav from './components/BottomNav'
+import BottomNav from './components/layout/BottomNav'
 import Profile from "./pages/Profile";
+import Feed from "./pages/Feed";
 
 
 export default function App() {
@@ -34,7 +34,7 @@ export default function App() {
           path="/" 
           element={
             <ProtectedRoute>
-              <Home />
+              <Feed />
             </ProtectedRoute>
           }
         />

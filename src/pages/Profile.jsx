@@ -1,10 +1,10 @@
-import LogoutButton from "../components/LogoutButton";
+import LogoutButton from "../components/auth/LogoutButton";
 import styles from "./Profile.module.css";
 import { supabase } from "../lib/supabaseClient";
 import { useEffect, useState } from "react";
-import ProfileSkeleton from "../components/ProfileSkeleton";
-import ProfileComponent from "../components/ProfileComponent";
-import Header from "../components/Header";
+import ProfileSkeleton from "../components/profile/ProfileSkeleton";
+import ProfileComponent from "../components/profile/ProfileComponent";
+import Header from "../components/layout/Header";
 
 
 export default function Profile() {

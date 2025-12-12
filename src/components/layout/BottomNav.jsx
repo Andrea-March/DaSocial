@@ -1,9 +1,9 @@
 import styles from "./BottomNav.module.css";
 import { Home, Megaphone, PlusCircle, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
-import NewPost from "./NewPost";
+import NewPost from "../feed/NewPost";
 import { useNavigate, useLocation } from "react-router-dom";
-import { usePostContext } from "../context/PostContext";
+import { usePostContext } from "../../context/PostContext";
 
 export default function BottomNav() {
   const navigate = useNavigate();

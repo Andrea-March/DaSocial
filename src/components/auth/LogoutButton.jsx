@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import styles from "./LogoutButton.module.css";
 
 export default function LogoutButton() {

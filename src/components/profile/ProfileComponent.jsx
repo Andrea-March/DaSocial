@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import imageCompression from "browser-image-compression";
 import styles from "./ProfileComponent.module.css";
-import { useUser } from "../context/UserContext";
-import { supabase } from "../lib/supabaseClient";
-import { useToast } from "../context/ToastContext";
-import { compressImage } from "../lib/compressImage";
+import { useUser } from "../../context/UserContext";
+import { supabase } from "../../lib/supabaseClient";
+import { useToast } from "../../context/ToastContext";
+import { compressImage } from "../../lib/compressImage";
 
 export default function ProfileComponent() {
   const { user, profile, setProfile } = useUser();

@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../../context/UserContext";
 import styles from "./NewPost.module.css";
 import { X, Image as ImageIcon } from "lucide-react";
-import { supabase } from "../lib/supabaseClient";
-import { usePostContext } from "../context/PostContext";
+import { supabase } from "../../lib/supabaseClient";
+import { usePostContext } from "../../context/PostContext";
 import imageCompression from "browser-image-compression";
-import { useToast } from "../context/ToastContext";
-import { compressImage } from "../lib/compressImage";
+import { useToast } from "../../context/ToastContext";
+import { compressImage } from "../../lib/compressImage";
 
 export default function NewPost({ onClose, postToEdit }) {
   const [text, setText] = useState("");

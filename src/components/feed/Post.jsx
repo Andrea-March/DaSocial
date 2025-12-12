@@ -1,12 +1,12 @@
 import styles from "./Post.module.css";
 import { Heart, MessageSquare, MoreVertical, Send } from "lucide-react";
 import { useState, useRef, useEffect, use } from "react";
-import { timeAgo } from "../lib/timeAgo";
-import { useUser } from "../context/UserContext";
-import { supabase } from "../lib/supabaseClient";
-import { usePostContext } from "../context/PostContext";
-import { groupComments } from "../lib/groupComments";
-import ActionMenu from "./ActionMenu";
+import { timeAgo } from "../../lib/timeAgo";
+import { useUser } from "../../context/UserContext";
+import { supabase } from "../../lib/supabaseClient";
+import { usePostContext } from "../../context/PostContext";
+import { groupComments } from "../../lib/groupComments";
+import ActionMenu from "../ui/ActionMenu";
 
 export default function Post({ post }) {
   const [menuOpen, setMenuOpen] = useState(false);

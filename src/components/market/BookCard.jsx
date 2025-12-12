@@ -2,10 +2,10 @@ import { useState } from "react";
 import BookImagePreview from "./BookImagePreview";
 import styles from "./BookCard.module.css";
 import { MoreVertical } from "lucide-react";
-import { useUser } from "../context/UserContext";
-import ActionMenu from "./ActionMenu";
-import { supabase } from "../lib/supabaseClient";
-import { useMarketContext } from "../context/MarketContext";
+import { useUser } from "../../context/UserContext";
+import ActionMenu from "../ui/ActionMenu";
+import { supabase } from "../../lib/supabaseClient";
+import { useMarketContext } from "../../context/MarketContext";
 export default function BookCard({ book }) {
   const [showPreview, setShowPreview] = useState(false);
   const imageSrc = book.image_url || "/placeholder-book.svg";

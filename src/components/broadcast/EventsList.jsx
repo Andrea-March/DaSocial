@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import BroadcastCard from "./BroadcastCard";
 import styles from "./EventsList.module.css";
 import EventCard from "./EventCard";
@@ -7,7 +7,7 @@ import CalendarView from "./CalendarView";
 import EventsOfDay from "./EventsOfDay";
 import CalendarSkeleton from "./CalendarSkeleton";
 import EventCardSkeleton from "./EventCardSkeleton";
-import SectionDivider from "./SectionDivider";
+import SectionDivider from "../layout/SectionDivider";
 
 export default function EventsList({ refreshTrigger }) {
   const [events, setEvents] = useState([]);

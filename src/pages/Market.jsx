@@ -1,14 +1,14 @@
 import { useState } from "react";
-import TopTabs from "../components/TopTabs";
-import MarketBooksFeed from "../components/MarketBooksFeed";
-import MarketItemsFeed from "../components/MarketItemsFeed";
-import Fab from "../components/Fab";
-import NewMarketItem from "../components/NewMarketItem";
-import NewMarketBook from "../components/NewMarketBook";
-import MarketChoiceSheet from "../components/MarketChoiceSheet";
+import TopTabs from "../components/layout/TopTabs";
+import MarketBooksFeed from "../components/market/MarketBooksFeed";
+import MarketItemsFeed from "../components/market/MarketItemsFeed";
+import Fab from "../components/layout/Fab";
+import NewMarketItem from "../components/market/NewMarketItem";
+import NewMarketBook from "../components/market/NewMarketBook";
+import MarketChoiceSheet from "../components/market/MarketChoiceSheet";
 import styles from "./Market.module.css";
-import Header from "../components/Header";
-import ConfirmModal from "../components/ConfirmModal";
+import Header from "../components/layout/Header";
+import ConfirmModal from "../components/ui/ConfirmModal";
 import { useMarketContext } from "../context/MarketContext";
 
 export default function MarketPage() {

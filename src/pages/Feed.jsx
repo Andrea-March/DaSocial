@@ -1,17 +1,17 @@
-import Header from "../components/Header";
-import styles from "./Home.module.css";
-import Post from "../components/Post";
+import Header from "../components/layout/Header";
+import styles from "./Feed.module.css";
+import Post from "../components/feed/Post";
 
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
-import PostSkeleton from "../components/PostSkeleton";
+import PostSkeleton from "../components/feed/PostSkeleton";
 import { usePostContext } from "../context/PostContext";
-import NewPost from "../components/NewPost";
-import ConfirmModal from '../components/ConfirmModal'
-import Fab from "../components/Fab";
+import NewPost from "../components/feed/NewPost";
+import ConfirmModal from '../components/ui/ConfirmModal'
+import Fab from "../components/layout/Fab";
 
 
-export default function Home() {
+export default function Feed() {
 
   const { lastCreatedPost, postBeingDeleted, deletePost, closeDeletePost } = usePostContext();
 

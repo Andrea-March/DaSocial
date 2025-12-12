@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import BookCard from "./BookCard";
 import styles from "./MarketFeed.module.css";
-import { useMarketContext } from "../context/MarketContext";
+import { useMarketContext } from "../../context/MarketContext";
 
 export default function MarketBooksFeed() {
   const [books, setBooks] = useState([]);

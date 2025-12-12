@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import ItemCard from "./ItemCard";
 import styles from "./MarketFeed.module.css";
-import { useMarketContext } from "../context/MarketContext";
 
 export default function MarketItemsFeed() {
   const [items, setItems] = useState([]);

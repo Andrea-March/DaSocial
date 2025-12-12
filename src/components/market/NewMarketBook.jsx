@@ -1,21 +1,31 @@
 import { useState, useRef } from "react";
-import styles from "./NewMarketItem.module.css";
+import styles from "./NewMarketItem.module.css"; // riusiamo gli stessi stili
 import { X, Image as ImageIcon } from "lucide-react";
-import { supabase } from "../lib/supabaseClient";
-import { useUser } from "../context/UserContext";
-import imageCompression from "browser-image-compression";
-import { compressImage } from "../lib/compressImage";
+import { supabase } from "../../lib/supabaseClient";
+import { useUser } from "../../context/UserContext";
+import { compressImage } from "../../lib/compressImage";
+import { useMarketContext } from "../../context/MarketContext";
 
-export default function NewMarketItem({ onClose, onCreated }) {
+export default function NewMarketBook({ onClose }) {
   const { user } = useUser();
   const fileInputRef = useRef(null);
 
+  const { triggerBookCreated } = useMarketContext();
+
+  // --- FORM STATE ---
   const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [edition, setEdition] = useState("");
+  const [publisher, setPublisher] = useState("");
+  const [isbn, setIsbn] = useState("");
+  const [subject, setSubject] = useState("");
+  const [schoolYear, setSchoolYear] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("other");
+
   const [imagePreview, setImagePreview] = useState(null);
 
-  // --- IMAGE HANDLING (identico a NewPost) ---
+  // --- IMAGE HANDLING ---
   const handleImage = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -30,27 +40,28 @@ export default function NewMarketItem({ onClose, onCreated }) {
     }
   };
 
-  // --- CREATE MARKET ITEM ---
+  // --- CREATE BOOK ---
   async function handleCreate() {
     if (!title.trim()) return;
     if (!user) return;
 
     let uploadedImageUrl = null;
 
+    // Upload immagine se presente
     if (imagePreview && fileInputRef.current?.files?.[0]) {
       const file = fileInputRef.current.files[0];
 
       const compressed = await compressImage(file);
 
       const newName = `${user.id}_${Date.now()}.webp`;
-      const filePath = `market_items/${newName}`;
+      const filePath = `market_books/${newName}`;
 
       const finalFile = new File([compressed], newName, {
         type: "image/webp"
       });
 
       const { error: uploadError } = await supabase.storage
-        .from("market_items")
+        .from("market_books")
         .upload(filePath, finalFile, { upsert: false });
 
       if (uploadError) {
@@ -59,20 +70,26 @@ export default function NewMarketItem({ onClose, onCreated }) {
       }
 
       const { data } = supabase.storage
-        .from("market_items")
+        .from("market_books")
         .getPublicUrl(filePath);
 
       uploadedImageUrl = data.publicUrl;
     }
 
-    // Insert nel DB + ritorno del record completo
+    // INSERT nel DB
     const { data, error } = await supabase
-      .from("market_items")
+      .from("market_books")
       .insert({
         user_id: user.id,
         title,
+        author,
+        edition,
+        publisher,
+        isbn,
+        subject,
+        school_year: schoolYear,
+        description,
         price: price ? Number(price) : null,
-        category,
         image_url: uploadedImageUrl
       })
       .select(`
@@ -82,7 +99,7 @@ export default function NewMarketItem({ onClose, onCreated }) {
       .single();
 
     if (!error) {
-      onCreated(data);
+      triggerBookCreated(data);
       onClose();
     }
   }
@@ -94,7 +111,7 @@ export default function NewMarketItem({ onClose, onCreated }) {
         {/* HEADER */}
         <div className={styles.header}>
           <span className={styles.cancel} onClick={onClose}>Annulla</span>
-          <span className={styles.title}>Nuovo articolo</span>
+          <span className={styles.title}>Nuovo libro</span>
           <span
             className={`${styles.publish} ${!title.trim() ? styles.disabled : ""}`}
             onClick={title.trim() ? handleCreate : undefined}
@@ -108,8 +125,63 @@ export default function NewMarketItem({ onClose, onCreated }) {
           className={styles.input}
           placeholder="Titolo"
           value={title}
-          maxLength={80}
           onChange={(e) => setTitle(e.target.value)}
+        />
+
+        {/* AUTHOR */}
+        <input
+          className={styles.input}
+          placeholder="Autore"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
+
+        {/* EDITION */}
+        <input
+          className={styles.input}
+          placeholder="Edizione (opzionale)"
+          value={edition}
+          onChange={(e) => setEdition(e.target.value)}
+        />
+
+        {/* PUBLISHER */}
+        <input
+          className={styles.input}
+          placeholder="Casa editrice (opzionale)"
+          value={publisher}
+          onChange={(e) => setPublisher(e.target.value)}
+        />
+
+        {/* ISBN */}
+        <input
+          className={styles.input}
+          placeholder="ISBN (opzionale)"
+          value={isbn}
+          onChange={(e) => setIsbn(e.target.value)}
+        />
+
+        {/* SUBJECT */}
+        <input
+          className={styles.input}
+          placeholder="Materia (opzionale)"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        />
+
+        {/* SCHOOL YEAR */}
+        <input
+          className={styles.input}
+          placeholder="Anno scolastico (es. 2° superiore)"
+          value={schoolYear}
+          onChange={(e) => setSchoolYear(e.target.value)}
+        />
+
+        {/* DESCRIPTION */}
+        <textarea
+          className={styles.textarea}
+          placeholder="Descrizione (opzionale)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
 
         {/* PRICE */}
@@ -120,18 +192,6 @@ export default function NewMarketItem({ onClose, onCreated }) {
           value={price}
           onChange={(e) => setPrice(e.target.value)}
         />
-
-        {/* CATEGORY */}
-        <select
-          className={styles.input}
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="other">Altro</option>
-          <option value="electronics">Elettronica</option>
-          <option value="school">Materiale scolastico</option>
-          <option value="clothes">Abbigliamento</option>
-        </select>
 
         {/* IMAGE UPLOAD */}
         <input

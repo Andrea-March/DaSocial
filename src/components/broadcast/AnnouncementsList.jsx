@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import BroadcastCard from "./BroadcastCard";
 import styles from "./AnnouncementsList.module.css";
 import AnnouncementSkeleton from "./AnnouncementSkeleton";
-import { useBroadcast } from "../context/broadcastContext";
+import { useBroadcast } from "../../context/broadcastContext";
 
 export default function AnnouncementsList({ refreshTrigger }) {
   const [broadcasts, setBroadcasts] = useState([]);

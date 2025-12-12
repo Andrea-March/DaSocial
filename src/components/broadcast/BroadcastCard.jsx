@@ -1,10 +1,10 @@
 import styles from "./BroadcastCard.module.css";
 import { Megaphone, CalendarDays, Pin, MoreVertical } from "lucide-react";
-import { timeAgo } from "../lib/timeAgo";
+import { timeAgo } from "../../lib/timeAgo";
 import { useState } from "react";
-import { useUser } from "../context/UserContext";
-import { useBroadcast } from "../context/broadcastContext";
-import ActionMenu from "./ActionMenu";
+import { useUser } from "../../context/UserContext";
+import { useBroadcast } from "../../context/broadcastContext";
+import ActionMenu from "../ui/ActionMenu";
 
 export default function BroadcastCard({ broadcast, variant = "minimal" }) {
   const { title, content, image_url, created_at, event_date, pinned } = broadcast;
