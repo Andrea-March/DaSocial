@@ -6,15 +6,32 @@ import { useUser } from "../../context/UserContext";
 import ActionMenu from "../ui/ActionMenu";
 import { supabase } from "../../lib/supabaseClient";
 import { useMarketContext } from "../../context/MarketContext";
+
+
 export default function BookCard({ book }) {
   const [showPreview, setShowPreview] = useState(false);
   const imageSrc = book.image_url || "/placeholder-book.svg";
-  const { openDeleteBook, triggerBookUpdated } = useMarketContext();
+  const {triggerBookUpdated, openConfirm, deleteBook } = useMarketContext();
 
   const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isOwner = user?.id === book.user_id;
+
+  function handleToggleSold(book) {
+    if (book.is_sold) {
+      // azione immediata
+      handleMarkAvailable(book);
+    } else {
+      // conferma solo quando segni come venduto
+      openConfirm({
+        title: "Segnare come venduto?",
+        description: "Il libro verrà contrassegnato come venduto.",
+        confirmLabel: "Segna come venduto",
+        onConfirm: () => handleMarkSold(book),
+      });
+    }
+  }
 
   async function handleMarkSold(book) {
     const { data, error } = await supabase
@@ -36,9 +53,21 @@ export default function BookCard({ book }) {
 
   }
 
-  async function handleDelete(book) {
-    // 1. delete immagine storage
-    // 2. delete record DB
+  async function handleMarkAvailable(book) {
+    const { error } = await supabase
+      .from("market_books")
+      .update({ is_sold: false })
+      .eq("id", book.id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    triggerBookUpdated({
+      ...book,
+      is_sold: false,
+    });
   }
 
   function handleOffer(book) {
@@ -49,18 +78,31 @@ export default function BookCard({ book }) {
     // TODO: segnalazione
   }
 
+  
+
   const actions = isOwner
     ? [
-        !book.is_sold && {
-          label: "Segna come venduto",
-          onClick: () => handleMarkSold(book),
+        {
+          label: book.is_sold
+            ? "Rimetti disponibile"
+            : "Segna come venduto",
+          onClick: () =>
+            handleToggleSold(book)
         },
         {
           label: "Elimina",
           danger: true,
-          onClick: () => openDeleteBook(book)
+          onClick: () =>
+            openConfirm({
+              title: "Eliminare il libro?",
+              subtitle: "Questa azione non può essere annullata.",
+              confirmText: "Elimina",
+              danger: true,
+              onConfirm: () => deleteBook(book),
+              onCancel: () => closeDeleteItem(),
+            }),
         }
-      ].filter(Boolean)
+      ]
     : [
         {
           label: "Fai un’offerta",
@@ -111,8 +153,9 @@ export default function BookCard({ book }) {
           onClose={() => setMenuOpen(false)}
           actions={actions}
         />
-      </div>
 
+      </div>
+      
       {/* FULLSCREEN PREVIEW */}
       {showPreview && (
         <BookImagePreview src={imageSrc} onClose={() => setShowPreview(false)} />

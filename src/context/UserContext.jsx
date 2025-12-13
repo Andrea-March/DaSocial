@@ -9,7 +9,6 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const avatarSrc = useMemo(() => {
-    console.log("HERE")
     if (!profile?.avatar_url) return null;
     if (!profile?.avatar_updated_at) return profile.avatar_url;
 

@@ -29,6 +29,7 @@
     opacity 0.15s ease,
     transform 0.15s ease;
 
+  pointer-events: auto;
   z-index: 99;
 }
 

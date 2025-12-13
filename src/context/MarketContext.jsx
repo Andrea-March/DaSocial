@@ -4,6 +4,11 @@ const MarketContext = createContext();
 
 export function MarketProvider({ children }) {
 
+  const [confirmConfig, setConfirmConfig] = useState(null);
+
+  const openConfirm = (config) => setConfirmConfig(config);
+  const closeConfirm = () => setConfirmConfig(null);
+
   function extractPath(url) {
     const match = url.match(/public\/([^/]+)\/(.+)$/);
     if (!match) return null;
@@ -22,12 +27,8 @@ export function MarketProvider({ children }) {
   };
 
   /* ---------- BOOKS ---------- */
-  const [bookBeingDeleted, setBookBeingDeleted] = useState(null);
   const [lastDeletedBookId, setLastDeletedBookId] = useState(null);
   const [lastCreatedBook, setLastCreatedBook] = useState(null);
-
-  const openDeleteBook = (book) => setBookBeingDeleted(book);
-  const closeDeleteBook = () => setBookBeingDeleted(null);
 
   const triggerBookDeleted = (id) => {
     setLastDeletedBookId(id);
@@ -38,10 +39,8 @@ export function MarketProvider({ children }) {
   };
 
 
-  async function deleteBook() {
-    if (!bookBeingDeleted) return;
-
-    const book = bookBeingDeleted;
+  async function deleteBook(book) {
+    if (!book) return;
 
     // 1) delete image
     if (book.image_url) {
@@ -64,7 +63,7 @@ export function MarketProvider({ children }) {
     triggerBookDeleted(book.id);
 
     // 4) close modal
-    closeDeleteBook();
+    closeConfirm();
   }
 
   const [lastUpdatedBook, setLastUpdatedBook] = useState(null);
@@ -77,6 +76,10 @@ export function MarketProvider({ children }) {
   return (
     <MarketContext.Provider
       value={{
+        confirmConfig,
+        openConfirm,
+        closeConfirm,
+
         /* items */
         itemBeingDeleted,
         openDeleteItem,
@@ -85,9 +88,6 @@ export function MarketProvider({ children }) {
         lastDeletedItemId,
 
         /* books */
-        bookBeingDeleted,
-        openDeleteBook,
-        closeDeleteBook,
         triggerBookDeleted,
         lastDeletedBookId,
 

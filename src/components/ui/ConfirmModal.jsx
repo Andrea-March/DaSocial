@@ -8,7 +8,7 @@ export default function ConfirmModal({
   cancelText = "Annulla",
   danger = false,
   onConfirm,
-  onCancel
+  onCancel = () => {}
 }) {
   if (!open) return null;
 

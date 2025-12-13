@@ -14,7 +14,7 @@ import { useMarketContext } from "../context/MarketContext";
 export default function MarketPage() {
   const [activeTab, setActiveTab] = useState("books");
 
-  const {bookBeingDeleted, deleteBook, closeDeleteBook} = useMarketContext();
+  const {confirmConfig, closeConfirm} = useMarketContext();
   // NEW STATES
   const [showChoiceSheet, setShowChoiceSheet] = useState(false);
   const [modalType, setModalType] = useState(null);
@@ -71,15 +71,23 @@ export default function MarketPage() {
             onClose={closeModal}
           />
         )}
-        <ConfirmModal
-          open={!!bookBeingDeleted}
-          title="Eliminare il libro?"
-          subtitle="Questa azione non può essere annullata."
-          confirmText="Elimina"
-          danger
-          onConfirm={deleteBook}
-          onCancel={closeDeleteBook}
-        />
+        {confirmConfig && (
+          <ConfirmModal
+            open
+            title={confirmConfig.title}
+            subtitle={confirmConfig.subtitle}
+            confirmText={confirmConfig.confirmText}
+            danger={confirmConfig.danger}
+            onConfirm={() => {
+              confirmConfig.onConfirm();
+              closeConfirm();
+            }}
+            onCancel={()=>{
+              confirmConfig.onCancel ? confirmConfig.onCancel() : "";
+              closeConfirm();
+            }}
+          />
+        )}
       </div>
     </>
   );
