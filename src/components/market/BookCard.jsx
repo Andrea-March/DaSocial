@@ -11,7 +11,7 @@ import { useMarketContext } from "../../context/MarketContext";
 export default function BookCard({ book }) {
   const [showPreview, setShowPreview] = useState(false);
   const imageSrc = book.image_url || "/placeholder-book.svg";
-  const { openConfirm, deleteBook, toggleTargetSold } = useMarketContext();
+  const { openConfirm, deleteBook, toggleTargetSold, closeDeleteItem } = useMarketContext();
 
   const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
