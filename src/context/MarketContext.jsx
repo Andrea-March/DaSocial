@@ -2,7 +2,14 @@ import { createContext, useContext, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 const MarketContext = createContext();
 
+const MARKET_TABLES = {
+  book: "market_books",
+  item: "market_items",
+};
+
 export function MarketProvider({ children }) {
+
+
 
   const [confirmConfig, setConfirmConfig] = useState(null);
 
@@ -13,6 +20,86 @@ export function MarketProvider({ children }) {
     const match = url.match(/public\/([^/]+)\/(.+)$/);
     if (!match) return null;
     return match[2];
+  }
+
+  function triggerItemUpdated(item){
+    if (item.type === "book") {
+      triggerBookUpdated(item.data);
+    }
+
+    if (item.type === "item") {
+      triggerItemUpdated(item.data);
+    }
+  }
+
+
+  async function markTargetSold({ type, id }) {
+    const table = MARKET_TABLES[type];
+    if (!table) {
+      console.error("Unknown market target type:", type);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from(table)
+      .update({ is_sold: true })
+      .eq("id", id)
+      .select(`
+        *,
+        profiles (
+          username,
+          avatar_url
+        )
+      `)
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    triggerItemUpdated({
+      type,
+      data,
+    });
+  }
+
+  async function markTargetAvailable({ type, id }) {
+    const table = MARKET_TABLES[type];
+    if (!table) {
+      console.error("Unknown market target type:", type);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from(table)
+      .update({ is_sold: false })
+      .eq("id", id)
+      .select(`
+        *,
+        profiles (
+          username,
+          avatar_url
+        )
+      `)
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    triggerItemUpdated({
+      type,
+      data,
+    });
+  }
+
+  function toggleTargetSold(target) {
+    if (target.is_sold) {
+      return markTargetAvailable(target);
+    }
+    return markTargetSold(target);
   }
 
   /* ---------- ITEMS ---------- */
@@ -45,7 +132,6 @@ export function MarketProvider({ children }) {
     // 1) delete image
     if (book.image_url) {
       const path = extractPath(book.image_url);
-      console.log(path)
       if (path) {
         await supabase.storage
           .from("market_books")
@@ -67,6 +153,7 @@ export function MarketProvider({ children }) {
   }
 
   const [lastUpdatedBook, setLastUpdatedBook] = useState(null);
+
   function triggerBookUpdated(book) {
     setLastUpdatedBook(book);
   }
@@ -79,6 +166,8 @@ export function MarketProvider({ children }) {
         confirmConfig,
         openConfirm,
         closeConfirm,
+
+        toggleTargetSold,
 
         /* items */
         itemBeingDeleted,

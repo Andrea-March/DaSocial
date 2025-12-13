@@ -11,7 +11,7 @@ import { useMarketContext } from "../../context/MarketContext";
 export default function BookCard({ book }) {
   const [showPreview, setShowPreview] = useState(false);
   const imageSrc = book.image_url || "/placeholder-book.svg";
-  const {triggerBookUpdated, openConfirm, deleteBook } = useMarketContext();
+  const { openConfirm, deleteBook, toggleTargetSold } = useMarketContext();
 
   const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,55 +20,27 @@ export default function BookCard({ book }) {
 
   function handleToggleSold(book) {
     if (book.is_sold) {
-      // azione immediata
-      handleMarkAvailable(book);
+       toggleTargetSold({
+            type: "book",
+            id: book.id,
+            is_sold: book.is_sold,
+        })
     } else {
       // conferma solo quando segni come venduto
       openConfirm({
         title: "Segnare come venduto?",
         description: "Il libro verrà contrassegnato come venduto.",
         confirmLabel: "Segna come venduto",
-        onConfirm: () => handleMarkSold(book),
+        onConfirm: () =>  toggleTargetSold({
+            type: "book",
+            id: book.id,
+            is_sold: book.is_sold,
+        }),
       });
     }
   }
 
-  async function handleMarkSold(book) {
-    const { data, error } = await supabase
-      .from("market_books")
-      .update({ is_sold: true })
-      .eq("id", book.id)
-      .select(`
-        *,
-        profiles ( username, avatar_url )
-      `)
-      .single();
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    triggerBookUpdated(data);
-
-  }
-
-  async function handleMarkAvailable(book) {
-    const { error } = await supabase
-      .from("market_books")
-      .update({ is_sold: false })
-      .eq("id", book.id);
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    triggerBookUpdated({
-      ...book,
-      is_sold: false,
-    });
-  }
 
   function handleOffer(book) {
     // TODO: flusso richiesta acquisto
