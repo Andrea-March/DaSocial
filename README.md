@@ -28,10 +28,18 @@ Progettata per essere semplice da installare, personalizzabile, e open-source.
 
 ## Screenshots
 
-![Feed](screenshots/feed.jpeg)
-![Post and comments](screenshots/events.jpeg)
-![Broadcasts](screenshots/broadcast.jpeg)
-![Marketplace](screenshots/market.jpeg)
+<a href="screenshots/feed.jpeg">
+  <img src="screenshots/feed.jpeg" width="500" />
+</a>
+<a href="screenshots/events.jpeg">
+  <img src="screenshots/events.jpeg" width="500" />
+</a>
+<a href="screenshots/broadcast.jpeg">
+  <img src="screenshots/broadcast.jpeg" width="500" />
+</a>
+<a href="screenshots/market.jpeg">
+  <img src="screenshots/market.jpeg" width="500" />
+</a>
 
 ## 🛠 Tech stack
 
