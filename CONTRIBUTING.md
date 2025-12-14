@@ -1,20 +1,16 @@
-# Contribuire a DaSocial
+## Contributing
 
-Grazie per il tuo interesse!  
-Ecco come contribuire:
+Thanks for your interest!
 
-## 🐛 Segnalare bug
-Apri un’issue con:
-- titolo chiaro
-- passaggi per riprodurre
-- screenshot se utile
+### Workflow
+- Fork the repo
+- Create a feature branch
+- Open a PR to `main`
 
-## ✨ Proporre miglioramenti
-Suggerisci una feature aprendo un’issue con etichetta `enhancement`.
+### Good First Issues
+Look for issues labeled `good first issue`.
 
-## 🔧 Sviluppare una PR
-1. Forka la repo  
-2. Crea un branch  
-3. Fai una PR ben descritta  
-
-Il codice deve rimanere semplice, leggibile e coerente con lo stile attuale.
+### Style
+- No TypeScript (for now)
+- CSS Modules
+- Keep components small and readable
