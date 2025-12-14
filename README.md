@@ -38,7 +38,7 @@ Lucide Icons
 
 ## 🚀 Avvio locale
 ### 1️⃣ Clona la repo
-git clone https://github.com/<your-username>/dasocial.git
+git clone https://github.com/Andrea-March/DaSocial.git
 cd dasocial
 
 ### 2️⃣ Installa le dipendenze
