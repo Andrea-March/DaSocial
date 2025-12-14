@@ -1,70 +1,189 @@
+-- POSTS
+alter table posts enable row level security;
 
-create policy "Anyone can view posts" on posts for SELECT using (true);
+create policy "Public read posts"
+on posts
+for select
+using (true);
 
-create policy "Anyone can view comments" on comments for SELECT using (true);
+create policy "Users can insert posts"
+on posts
+for insert
+with check (auth.uid() = user_id);
 
-create policy "Anyone can view market items" on market\items for SELECT using (true);
+create policy "Users can update own posts"
+on posts
+for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
-create policy "Users can insert comments" on comments for INSERT using (true) with check ((( SELECT auth.uid() AS uid) = user\id));
+create policy "Users can delete own posts"
+on posts
+for delete
+using (auth.uid() = user_id);
 
-create policy "Users can insert their own market items" on market\items for INSERT using (true) with check ((( SELECT auth.uid() AS uid) = user\id));
 
-create policy "select likes" on post\likes for SELECT using (true);
+-- COMMENTS
 
-create policy "delete own like" on post\likes for DELETE using ((( SELECT auth.uid() AS uid) = user\id));
+alter table comments enable row level security;
 
-create policy "broadcasts are public" on broadcasts for SELECT using (true);
+create policy "Public read comments"
+on comments
+for select
+using (true);
 
-create policy "Profiles are public" on profiles for SELECT using (true);
+create policy "Users can insert comments"
+on comments
+for insert
+with check (auth.uid() = user_id);
 
-create policy "Users can update their profile" on profiles for UPDATE using ((( SELECT auth.uid() AS uid) = id)) with check ((( SELECT auth.uid() AS uid) = id));
+create policy "Users can update own comments"
+on comments
+for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
-create policy "Users can delete their comments" on comments for DELETE using ((( SELECT auth.uid() AS uid) = user\id));
+create policy "Users can delete own comments"
+on comments
+for delete
+using (auth.uid() = user_id);
 
-create policy "insert own like" on post\likes for INSERT using (true) with check ((( SELECT auth.uid() AS uid) = user\id));
 
-create policy "Users can update their comments" on comments for UPDATE using ((( SELECT auth.uid() AS uid) = user\id)) with check ((( SELECT auth.uid() AS uid) = user\id));
+-- LIKES 
+alter table post_likes enable row level security;
 
-create policy "Users can delete their own items" on market\items for DELETE using ((( SELECT auth.uid() AS uid) = user\id));
+create policy "Public read likes"
+on post_likes
+for select
+using (true);
 
-create policy "Users can update their own items" on market\items for UPDATE using ((( SELECT auth.uid() AS uid) = user\id));
+create policy "Insert own like"
+on post_likes
+for insert
+with check (auth.uid() = user_id);
 
-create policy "Users can delete own posts" on posts for DELETE using ((( SELECT auth.uid() AS uid) = user\id));
+create policy "Delete own like"
+on post_likes
+for delete
+using (auth.uid() = user_id);
 
-create policy "Users can insert posts" on posts for INSERT using (true) with check ((( SELECT auth.uid() AS uid) = user\id));
 
-create policy "Admin or representatives can insert broadcasts" on broadcasts for INSERT using (true) with check (((( SELECT auth.uid() AS uid) = author\id) OR (EXISTS ( SELECT 1
+-- MARKET ITEMS
+alter table market_items enable row level security;
 
-FROM profiles p
+create policy "Public read market items"
+on market_items
+for select
+using (true);
 
-WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND ((p.role = 'admin'::text) OR (p.is\representative = true)))))));
+create policy "Insert own market items"
+on market_items
+for insert
+with check (auth.uid() = user_id);
 
-create policy "Users can update own posts" on posts for UPDATE using ((( SELECT auth.uid() AS uid) = user\id)) with check ((( SELECT auth.uid() AS uid) = user\id));
+create policy "Update own market items"
+on market_items
+for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
-create policy "Insert own profile" on profiles for INSERT using (true) with check ((( SELECT auth.uid() AS uid) = id));
+create policy "Delete own market items"
+on market_items
+for delete
+using (auth.uid() = user_id);
 
-create policy "Users can insert their own market books" on market\books for INSERT using (true) with check ((( SELECT auth.uid() AS uid) = user\id));
 
-create policy "Users can delete their own market books" on market\books for DELETE using ((( SELECT auth.uid() AS uid) = user\id));
+-- MARKET_BOOKS
 
-create policy "Users can update their own market books" on market\books for UPDATE using ((( SELECT auth.uid() AS uid) = user\id));
+alter table market_books enable row level security;
 
-create policy "Market books are viewable by everyone" on market\books for SELECT using (true);
+create policy "Public read market books"
+on market_books
+for select
+using (true);
 
-create policy "authorized\users\can\update\broadcasts" on broadcasts for UPDATE using (((author\id = ( SELECT auth.uid() AS uid)) OR (EXISTS ( SELECT 1
+create policy "Insert own market books"
+on market_books
+for insert
+with check (auth.uid() = user_id);
 
-FROM profiles
+create policy "Update own market books"
+on market_books
+for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
-WHERE ((profiles.id = ( SELECT auth.uid() AS uid)) AND ((profiles.role = 'admin'::text) OR (profiles.is\representative = true))))))) with check (((author\id = ( SELECT auth.uid() AS uid)) OR (EXISTS ( SELECT 1
+create policy "Delete own market books"
+on market_books
+for delete
+using (auth.uid() = user_id);
 
-FROM profiles
 
-WHERE ((profiles.id = ( SELECT auth.uid() AS uid)) AND ((profiles.role = 'admin'::text) OR (profiles.is\representative = true)))))));
+-- BROADCASTS
 
-create policy "authorized\users\can\delete\broadcasts" on broadcasts for DELETE using (((author\id = ( SELECT auth.uid() AS uid)) OR (EXISTS ( SELECT 1
+alter table broadcasts enable row level security;
 
-FROM profiles
+create policy "Public read broadcasts"
+on broadcasts
+for select
+using (true);
 
-WHERE ((profiles.id = ( SELECT auth.uid() AS uid)) AND ((profiles.role = 'admin'::text) OR (profiles.is\representative = true)))))));
+create policy "Authorized users can insert broadcasts"
+on broadcasts
+for insert
+with check (
+  author_id = auth.uid()
+  or exists (
+    select 1
+    from profiles p
+    where p.id = auth.uid()
+      and (p.role = 'admin' or p.is_representative = true)
+  )
+);
 
-create policy "Users can update their own profile" on profiles for UPDATE using ((id = ( SELECT auth.uid() AS uid))) with check ((id = ( SELECT auth.uid() AS uid)));
+create policy "Authorized users can update broadcasts"
+on broadcasts
+for update
+using (
+  author_id = auth.uid()
+  or exists (
+    select 1
+    from profiles p
+    where p.id = auth.uid()
+      and (p.role = 'admin' or p.is_representative = true)
+  )
+);
+
+create policy "Authorized users can delete broadcasts"
+on broadcasts
+for delete
+using (
+  author_id = auth.uid()
+  or exists (
+    select 1
+    from profiles p
+    where p.id = auth.uid()
+      and (p.role = 'admin' or p.is_representative = true)
+  )
+);
+
+
+-- PROFILES 
+
+alter table profiles enable row level security;
+
+create policy "Public read profiles"
+on profiles
+for select
+using (true);
+
+create policy "Insert own profile"
+on profiles
+for insert
+with check (id = auth.uid());
+
+create policy "Update own profile"
+on profiles
+for update
+using (id = auth.uid())
+with check (id = auth.uid());

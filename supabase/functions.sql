@@ -1,14 +1,15 @@
 CREATE OR REPLACE FUNCTION public.handle_new_user()
- RETURNS trigger
- LANGUAGE plpgsql
- SET search_path TO 'public'
-AS $function$
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path TO public
+AS $$
 begin
   insert into public.profiles (id, username)
   values (new.id, new.raw_user_meta_data ->> 'username');
+  on conflict (id) do nothing;
   return new;
 end;
-$function$
+$$;
 
 
 CREATE OR REPLACE FUNCTION public.increment_like(post_uuid uuid)
@@ -64,6 +65,7 @@ $function$
 CREATE OR REPLACE FUNCTION public.update_broadcast_get_full(bid uuid, new_title text, new_content text, new_image_url text, new_event_date date, new_pinned boolean)
  RETURNS jsonb
  LANGUAGE plpgsql
+ SET search_path TO public
 AS $function$
 declare
   result jsonb;
@@ -118,27 +120,42 @@ end;
 $function$
 
 
-CREATE OR REPLACE FUNCTION public.create_market_book_get_full(p_title text, p_author text, p_edition text, p_publisher text, p_isbn text, p_subject text, p_school_year text, p_description text, p_price numeric, p_image_url text, p_user_id uuid)
- RETURNS SETOF market_books_with_profile
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-begin
-  insert into market_books (
-    title, author, edition, publisher, isbn,
-    subject, school_year, description, price,
-    image_url, user_id
-  ) values (
-    p_title, p_author, p_edition, p_publisher, p_isbn,
-    p_subject, p_school_year, p_description, p_price,
-    p_image_url, p_user_id
-  );
+CREATE OR REPLACE FUNCTION public.create_market_book_get_full(
+  p_title text,
+  p_author text,
+  p_edition text,
+  p_publisher text,
+  p_isbn text,
+  p_subject text,
+  p_school_year text,
+  p_description text,
+  p_price numeric,
+  p_image_url text
+)
+    RETURNS SETOF market_books_with_profile
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO public
+    AS $$
+    declare
+    uid uuid := auth.uid();
+    begin
+    insert into market_books (
+        title, author, edition, publisher, isbn,
+        subject, school_year, description, price,
+        image_url, user_id
+    ) values (
+        p_title, p_author, p_edition, p_publisher, p_isbn,
+        p_subject, p_school_year, p_description, p_price,
+        p_image_url, uid
+    );
 
-  return query
-  select *
-  from market_books_with_profile
-  where user_id = p_user_id
-  order by created_at desc
-  limit 1;
-end;
-$function$
+    return query
+    select *
+    from market_books_with_profile
+    where user_id = uid
+    order by created_at desc
+    limit 1;
+    end;
+    $$;
+
