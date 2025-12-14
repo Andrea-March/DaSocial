@@ -1,3 +1,37 @@
+create table profiles (
+  id uuid primary key,
+  username text not null,
+  avatar_url text,
+  bio text,
+  classe text,
+  sezione text,
+  role text default 'student',
+  is_representative boolean default false,
+  avatar_updated_at timestamp with time zone,
+  created_at timestamp with time zone default now()
+);
+
+
+create table posts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  content text not null,
+  image_url text,
+  like_count integer default 0,
+  created_at timestamp with time zone default now()
+);
+
+
+create table post_likes (
+  id bigint generated always as identity primary key,
+  post_id uuid not null references posts(id) on delete cascade,
+  user_id uuid not null references profiles(id) on delete cascade,
+  created_at timestamp with time zone default now(),
+  unique (post_id, user_id)
+);
+
+
+
 create table broadcasts (
   id uuid primary key default gen_random_uuid(),
   author_id uuid not null references profiles(id),
@@ -107,33 +141,25 @@ for each row
 execute function market_items_tsv_trigger();
 
 
-create table post_likes (
-  id bigint generated always as identity primary key,
-  post_id uuid not null references posts(id) on delete cascade,
-  user_id uuid not null references profiles(id) on delete cascade,
-  created_at timestamp with time zone default now(),
-  unique (post_id, user_id)
-);
-
-
-create table posts (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references profiles(id) on delete cascade,
-  content text not null,
-  image_url text,
-  like_count integer default 0,
-  created_at timestamp with time zone default now()
-);
-
-create table profiles (
-  id uuid primary key,
-  username text not null,
-  avatar_url text,
-  bio text,
-  classe text,
-  sezione text,
-  role text default 'student',
-  is_representative boolean default false,
-  avatar_updated_at timestamp with time zone,
-  created_at timestamp with time zone default now()
-);
+create view market_books_with_profile as
+select
+  mb.id,
+  mb.title,
+  mb.author,
+  mb.edition,
+  mb.publisher,
+  mb.isbn,
+  mb.subject,
+  mb.school_year,
+  mb.description,
+  mb.price,
+  mb.image_url,
+  mb.is_sold,
+  mb.created_at,
+  mb.user_id,
+  jsonb_build_object(
+    'username', p.username,
+    'avatar_url', p.avatar_url
+  ) as profiles
+from market_books mb
+left join profiles p on p.id = mb.user_id;

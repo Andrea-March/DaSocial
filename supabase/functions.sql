@@ -6,7 +6,6 @@ AS $$
 begin
   insert into public.profiles (id, username)
   values (new.id, new.raw_user_meta_data ->> 'username');
-  on conflict (id) do nothing;
   return new;
 end;
 $$;
@@ -22,7 +21,7 @@ begin
   set like_count = like_count + 1
   where id = post_uuid;
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.update_post_get_full(pid uuid, new_content text, new_image_url text)
@@ -59,7 +58,7 @@ begin
 
   return result;
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.update_broadcast_get_full(bid uuid, new_title text, new_content text, new_image_url text, new_event_date date, new_pinned boolean)
@@ -103,7 +102,7 @@ begin
 
   return result;
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.decrement_like(post_uuid uuid)
@@ -117,7 +116,7 @@ begin
   where id = post_uuid
     and like_count > 0;
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.create_market_book_get_full(

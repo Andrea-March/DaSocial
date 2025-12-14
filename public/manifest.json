@@ -1,7 +1,7 @@
 {
   "name": "DaSocial",
   "short_name": "DaSocial",
-  "description": "La bacheca digitale del Da Vinci.",
+  "description": "La bacheca digitale della scuola.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
