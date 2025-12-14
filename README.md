@@ -18,13 +18,20 @@ Progettata per essere semplice da installare, personalizzabile, e open-source.
 
 📅 Eventi con data dedicata
 
-🗂 Modali eleganti per edit/delete
+🗂 Modali per edit/delete
 
 🖼 Upload immagini con compressione & cleanup automatico
 
 🔐 Supabase (Auth, Storage, RLS avanzate)
 
 ⚡ UI moderna e responsive
+
+## Screenshots
+
+![Feed](screenshots/feed.jpeg)
+![Post and comments](screenshots/events.jpeg)
+![Broadcasts](screenshots/broadcast.jpeg)
+![Marketplace](screenshots/market.jpeg)
 
 ## 🛠 Tech stack
 
